@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Velway · AI Discovery Pricing Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F6F5; --panel:#FFFFFF; --ink:#12302F; --ink-2:#4A6362; --line:#D5E0DE;
+  --teal:#0F4C4C; --teal-2:#186767; --teal-soft:#E1EEEC; --mint:#CFEAE3;
+  --amber:#B9791E; --amber-soft:#FBF1DE; --red:#A63D2F; --red-soft:#F9E5E1;
+  --input:#FFFFFF; --input-line:#B7C9C6; --focus:#2A9D8F;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1C1B; --panel:#152927; --ink:#E6F0EE; --ink-2:#9DB5B2; --line:#264240;
+    --teal:#7FD1C4; --teal-2:#5FB8AB; --teal-soft:#1B3634; --mint:#1F4642;
+    --amber:#E4B15E; --amber-soft:#3A2E16; --red:#F08B7C; --red-soft:#3D1F1A;
+    --input:#0F2120; --input-line:#3A5A57; --focus:#7FD1C4;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1C1B; --panel:#152927; --ink:#E6F0EE; --ink-2:#9DB5B2; --line:#264240;
+  --teal:#7FD1C4; --teal-2:#5FB8AB; --teal-soft:#1B3634; --mint:#1F4642;
+  --amber:#E4B15E; --amber-soft:#3A2E16; --red:#F08B7C; --red-soft:#3D1F1A;
+  --input:#0F2120; --input-line:#3A5A57; --focus:#7FD1C4;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--teal)}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.side{background:var(--teal);color:#EAF4F2;padding:22px 18px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:18px}
+:root[data-theme="dark"] .side, .side{color:#EAF4F2}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .side{background:#0B2524} }
+:root[data-theme="dark"] .side{background:#0B2524}
+.brand{font-weight:600;font-size:17px;letter-spacing:.01em}
+.brand small{display:block;font-weight:400;opacity:.75;font-size:12px;margin-top:2px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{background:transparent;border:0;text-align:left;padding:9px 10px;border-radius:6px;color:inherit;opacity:.8;cursor:pointer}
+.nav button:hover{opacity:1;background:rgba(255,255,255,.08)}
+.nav button.on{opacity:1;background:rgba(255,255,255,.14);font-weight:600}
+.side .foot{margin-top:auto;font-size:12px;opacity:.75;line-height:1.5}
+.modebox{background:rgba(255,255,255,.1);border-radius:8px;padding:10px}
+.modebox label{display:block;font-size:12px;opacity:.8;margin-bottom:6px}
+.seg{display:flex;background:rgba(0,0,0,.2);border-radius:6px;padding:2px}
+.seg button{flex:1;border:0;background:transparent;color:inherit;padding:6px;border-radius:5px;cursor:pointer;font-size:13px;opacity:.75}
+.seg button.on{background:rgba(255,255,255,.9);color:var(--teal);opacity:1;font-weight:600}
+:root[data-theme="dark"] .seg button.on{color:#0B2524}
+.main{padding:26px 34px 80px;max-width:1180px}
+.topbar{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+h1{font-size:24px;font-weight:600;margin:0}
+h2{font-size:16px;font-weight:600;margin:26px 0 10px}
+h2:first-child{margin-top:0}
+.sub{color:var(--ink-2);margin:4px 0 0}
+.page{display:none}.page.on{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px 22px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:13px;color:var(--ink-2)}
+.field .hint{font-size:12px;color:var(--ink-2)}
+input[type=text],input[type=number],input[type=date],select,textarea{
+  background:var(--input);border:1px solid var(--input-line);border-radius:6px;padding:7px 9px;width:100%;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--focus);outline-offset:1px;border-color:transparent}
+input[type=number]{font-family:var(--mono);font-size:14px}
+textarea{min-height:120px;font-family:var(--mono);font-size:13px;line-height:1.5}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{color:var(--ink-2);font-weight:500;font-size:13px}
+td.n,th.n{text-align:right;font-family:var(--mono);font-size:13.5px}
+td input[type=number]{padding:4px 6px;width:88px;text-align:right}
+td input[type=text]{padding:4px 6px}
+.tbl-wrap{overflow-x:auto}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;background:var(--teal-soft);color:var(--teal)}
+.pill.warn{background:var(--amber-soft);color:var(--amber)}
+.pill.bad{background:var(--red-soft);color:var(--red)}
+.note{background:var(--amber-soft);border-left:3px solid var(--amber);padding:10px 12px;border-radius:6px;font-size:14px;margin:10px 0}
+.note.bad{background:var(--red-soft);border-color:var(--red)}
+.note.ok{background:var(--teal-soft);border-color:var(--teal)}
+.btn{background:var(--teal);color:#fff;border:0;padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:500}
+:root[data-theme="dark"] .btn{color:#0B2524}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .btn{color:#0B2524} }
+.btn.ghost{background:transparent;color:var(--teal);border:1px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pkgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.pkg{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--panel);cursor:pointer;position:relative}
+.pkg.on{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal)}
+.pkg .name{font-weight:600}
+.pkg .price{font-family:var(--mono);font-size:22px;margin:6px 0 2px}
+.pkg .meta{color:var(--ink-2);font-size:13px}
+.pkg .cost{font-size:12px;color:var(--ink-2);font-family:var(--mono);margin-top:6px}
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+@media (max-width:900px){.hero{grid-template-columns:1fr}}
+.bigprice{font-family:var(--mono);font-size:40px;line-height:1;margin:6px 0 2px}
+.kv{display:grid;grid-template-columns:1fr auto;gap:6px 18px;font-size:14px}
+.kv .n{font-family:var(--mono);text-align:right}
+.kv .tot{font-weight:600;border-top:1px solid var(--line);padding-top:6px;margin-top:2px}
+.bar{height:10px;background:var(--teal-soft);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--teal)}
+.bar i.over{background:var(--red)}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+.chk input{margin-top:4px}
+.chk .lvl{font-size:12px;min-width:60px;color:var(--ink-2)}
+.chk .what{font-size:13px;color:var(--ink-2)}
+.summary-bar{position:fixed;bottom:0;left:230px;right:0;background:var(--panel);border-top:1px solid var(--line);padding:10px 34px;display:flex;gap:26px;align-items:center;font-size:14px;z-index:5}
+.summary-bar b{font-family:var(--mono);font-size:18px}
+.summary-bar .dim{color:var(--ink-2)}
+.internal-only{}
+body.partner .internal-only{display:none!important}
+.sm{font-size:13px;color:var(--ink-2)}
+.tabs{display:none;gap:4px;overflow-x:auto;padding:8px 12px;background:var(--teal);color:#EAF4F2}
+.tabs button{flex:0 0 auto;background:transparent;border:0;color:inherit;padding:8px 10px;border-radius:6px;opacity:.8;white-space:nowrap}
+.tabs button.on{background:rgba(255,255,255,.16);opacity:1;font-weight:600}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  .tabs{display:flex;position:sticky;top:0;z-index:6}
+  .main{padding:18px 16px 90px}
+  .summary-bar{left:0;padding:10px 16px;gap:14px;flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<div class="tabs" id="tabs"></div>
+<div class="app">
+  <aside class="side">
+    <div class="brand">Velway<small>AI Discovery · pricing calculator</small></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="modebox">
+      <label id="lblMode">Режим</label>
+      <div class="seg" id="modeSeg">
+        <button data-m="internal">Internal</button>
+        <button data-m="partner">Partner</button>
+      </div>
+    </div>
+    <div class="modebox">
+      <label id="lblLang">Мова інтерфейсу</label>
+      <div class="seg" id="langSeg">
+        <button data-l="uk">UA</button>
+        <button data-l="en">EN</button>
+      </div>
+    </div>
+    <div class="foot" id="foot"></div>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+<div class="summary-bar" id="sumbar"></div>
+
+<script>
+/* ===================== i18n ===================== */
+const T = {
+uk:{
+ nav:{client:"Клієнт",scope:"Скоуп",result:"Результат",capacity:"Capacity",risks:"Ризики",proposal:"КП",settings:"Налаштування"},
+ mode:"Режим", lang:"Мова інтерфейсу",
+ foot:"Internal — з собівартістю та маржею. Partner — лише ціна для клієнта. Дані зберігаються у цьому браузері.",
+ client:{title:"Профіль клієнта",sub:"Ці параметри задають множники. Жовтих полів немає — усе нижче є вхідними даними.",
+  basic:"Базове",company:"Компанія",contact:"Контакт",email:"Email / месенджер",date:"Дата запиту",start:"Плановий старт",
+  params:"Параметри оцінки",country:"Країна клієнта",vertical:"Вертикаль",size:"Розмір компанії",urgency:"Терміновість",
+  maturity:"AI-зрілість / готовність даних",lang:"Мова delivery",channel:"Канал",cur:"Валюта пропозиції",
+  ctx:"Контекст",budget:"Очікуваний бюджет (якщо відомо)",dm:"Особа, що ухвалює рішення",nda:"NDA потрібне",
+  legal:"Юрособа-виконавець",pay:"Умови оплати",partner:"Партнерська опція",partnerNone:"Без партнера",
+  channels:{referral:"Referral (через партнера)",direct:"Direct (пряма)"},
+  langWarn:"З цією мовою delivery ми зараз не працюємо (лише UA та EN). Ціна не розраховується, поки не ухвалене рішення про мову."},
+ scope:{title:"Скоуп проєкту",sub:"Оберіть пакет, режим масштабування та add-ons. Години рахуються з нормативів у Налаштуваннях.",
+  pkg:"Пакет",unit:"Одиниця масштабування",units:{dept:"Відділи / області",wf:"Процеси / воркфлоу"},
+  n_dept:"Кількість відділів у скоупі",n_wf:"Кількість воркфлоу у скоупі",interviews:"Додаткові інтерв'ю зі стейкхолдерами",
+  roadmap:"Глибина роадмапу",usecases:"Use case'ів у роадмапі",wdays:"Днів воркшопу",
+  addons:"Add-ons",incl:"Входить у пакет",hours:"год",fixed:"фікс",travel:"Відрядження / зовнішні витрати, € (без націнки)",
+  pkgs:{workshop:"Workshop",express:"Express",discovery:"AI Discovery",premium:"Premium"},
+  pkgd:{workshop:"1–2 дні: alignment, лонгліст можливостей, наступні кроки",express:"1 область, ~2 тижні: інтерв'ю, 3–5 use case'ів, короткий роадмап",discovery:"Повний аудит усіх ключових областей, пріоритезація, 12-міс роадмап, бюджети та KPI",premium:"Discovery + RFP для топ-3 пілотів + 3 міс супервізії + вибір вендора + навчання"}},
+ result:{title:"Результат",sub:"Собівартість → ціна → партнерська комісія → net. Усі чотири пакети рахуються паралельно.",
+  selected:"Обраний пакет",client_price:"Ціна для клієнта",vat:"ПДВ",gross:"Разом з ПДВ",
+  cost:"Собівартість (команда)",ext:"Зовнішні витрати",mult:"Комбінований множник",margin:"Маржа",
+  partner_fee:"Партнерська комісія",net:"Net Velway",eff_rate:"Ефективна ставка",per_day:"€/день",
+  hours:"Години по ролях",role:"Роль",h:"Год",d:"Дні",rate:"Ставка",costc:"Cost, €",total:"Разом",
+  multiplierbreak:"Множники",timeline:"Оцінка таймлайну",weeks:"тижнів",
+  compare:"Порівняння пакетів",min_applied:"застосовано мінімум пакета",
+  pay:"Графік оплат",export:"Експортувати таблицю (CSV)",exportNo:"Експорт недоступний у цьому перегляді",
+  scen:"Сценарії: ціна від кількості відділів / воркфлоу",scenSub:"Ті самі клієнт і налаштування, змінюється лише скоуп. Підсвічено найближчий до цільової ціни варіант.",
+  target:"Цільова ціна, €",units:"Відділів / воркфлоу",calib:"Калібрування нормативу під цільову ціну",
+  calibText:(n,pr,k,hrs)=>`Щоб ${n} ${n===1?"відділ":"відділи/відділів"} коштували ${pr} € при поточній маржі й множниках, норматив на відділ має бути ×${k} від теперішнього: ${hrs}.`,
+  calibNo:"Цільова ціна нижча за фіксовану частину пакета — недосяжна без зміни маржі або мінімуму.",
+  apply:"Застосувати цей норматив",applied:"Норматив оновлено",
+  linesL:{prep:"Підготовка (бриф, анкети)",kickoff:"Стратегічна сесія з власником / CEO",areas:"Робота по відділах / воркфлоу",interviews:"Додаткові інтерв'ю",usecases:"Розробка AI use case'ів",prio:"Пріоритезація, матриця impact/effort",roadmap:"Роадмап",kpi:"Бюджети та KPI для топ-5",doc:"Документація / компендіум",present:"Презентація та Q&A",facil:"Фасилітація воркшопу"}},
+ capacity:{title:"Capacity-планувальник",sub:"Скільки паралельних проєктів витягує команда. Порівнюємо потрібні дні по ролях із доступними на місяць.",
+  team:"Команда",people:"Осіб",days:"Робочих днів/міс на особу",util:"Утилізація, %",avail:"Доступно днів/міс",
+  projects:"Проєкти в роботі",name:"Проєкт",pkg:"Пакет",units:"Відділів/воркфлоу",weeks:"Тижнів",add:"Додати поточний розрахунок",del:"Прибрати",
+  load:"Навантаження по ролях на місяць",need:"Потрібно",over:"перевантаження",ok:"є запас",empty:"Додайте проєкти, щоб побачити навантаження."},
+ risks:{title:"Ризик-чекліст",sub:"Пройдіть перед підписанням. Підсумок червоний — подумайте двічі.",summary:"Підсумок",
+  lvl:{High:"Високий",Medium:"Середній",Low:"Низький"},
+  verdict:{stop:"СТОП. Перегляньте умови або відмовтеся.",caution:"Обережно. Захистіться у контракті.",many:"Багато середніх ризиків. Посильте контракт.",ok:"OK — можна працювати."}},
+ proposal:{title:"Комерційна пропозиція",sub:"Текст формується з Клієнта та Результату. Скопіюйте у лист або документ.",lang:"Мова КП",copy:"Скопіювати текст",copied:"Скопійовано"},
+ settings:{title:"Налаштування",sub:"Усі ставки, нормативи та множники. Зміни застосовуються миттєво і зберігаються у браузері.",
+  rates:"Ставки ролей (внутрішня собівартість)",roles:{ba:"Бізнес-аналітик",pm:"Проджект-менеджер",tl:"Тех-лід",arch:"Архітект"},
+  hpd:"Годин у дні",buffer:"Буфер на перевитрати, %",
+  margins:"Цільова gross-маржа по пакетах, %",mins:"Мінімальна ціна пакета, €",
+  norms:"Норматив на один відділ / область (год)",normsub:"Сесія 2 год (BA) + 3 год аналізу (BA) + 5 год на кожну роль",
+  wfactor:"Коефіцієнт для воркфлоу (частка від нормативу відділу)",
+  fixed:"Фіксовані години пакетів (не залежать від кількості відділів)",
+  addons:"Add-ons (години по ролях або фікс-ціна)",addon:"Add-on",fixedPrice:"Фікс-ціна, € (0 = рахувати з годин)",
+  country:"Множники країн",vertical:"Множники вертикалей",size:"Множники розміру клієнта",urgency:"Множники терміновості",
+  maturity:"Множники AI-зрілості",partner:"Партнерські опції",fx:"Курси валют (1 EUR =)",legal:"Юрособи",vatRate:"ПДВ, %",
+  payterms:"Умови оплати",label:"Назва",value:"Значення",mult:"Множник",comment:"Коментар",
+  reset:"Скинути до значень за замовчуванням",resetQ:"Скинути всі налаштування до default?",
+  pA:"A — % від консалтингових послуг",pB_fixed:"B — фікс за discovery, €",pB_pct:"B — % від SOW впровадження",
+  pC:"C — white label (партнер сам робить націнку)"}
+},
+en:{
+ nav:{client:"Client",scope:"Scope",result:"Result",capacity:"Capacity",risks:"Risks",proposal:"Proposal",settings:"Settings"},
+ mode:"Mode", lang:"Interface language",
+ foot:"Internal — with cost and margin. Partner — client price only. Data is stored in this browser.",
+ client:{title:"Client profile",sub:"These parameters drive the multipliers. Everything below is an input.",
+  basic:"Basics",company:"Company",contact:"Contact",email:"Email / messenger",date:"Inquiry date",start:"Planned start",
+  params:"Estimation parameters",country:"Client country",vertical:"Vertical",size:"Company size",urgency:"Urgency",
+  maturity:"AI maturity / data readiness",lang:"Delivery language",channel:"Channel",cur:"Quote currency",
+  ctx:"Context",budget:"Expected budget (if disclosed)",dm:"Decision maker",nda:"NDA required",
+  legal:"Contracting entity",pay:"Payment terms",partner:"Partner option",partnerNone:"No partner",
+  channels:{referral:"Referral (via partner)",direct:"Direct"},
+  langWarn:"We do not deliver in this language yet (UA and EN only). No price is calculated until the delivery-language decision is made."},
+ scope:{title:"Project scope",sub:"Pick a package, a scaling unit and add-ons. Hours come from the norms in Settings.",
+  pkg:"Package",unit:"Scaling unit",units:{dept:"Departments / areas",wf:"Processes / workflows"},
+  n_dept:"Departments in scope",n_wf:"Workflows in scope",interviews:"Extra stakeholder interviews",
+  roadmap:"Roadmap depth",usecases:"Use cases in roadmap",wdays:"Workshop days",
+  addons:"Add-ons",incl:"Included in package",hours:"h",fixed:"fixed",travel:"Travel / external costs, € (no markup)",
+  pkgs:{workshop:"Workshop",express:"Express",discovery:"AI Discovery",premium:"Premium"},
+  pkgd:{workshop:"1–2 days: alignment, opportunity longlist, next steps",express:"1 area, ~2 weeks: interviews, 3–5 use cases, short roadmap",discovery:"Full audit of all key areas, prioritisation, 12-month roadmap, budgets and KPIs",premium:"Discovery + RFPs for top-3 pilots + 3 months supervision + vendor selection + training"}},
+ result:{title:"Result",sub:"Cost → price → partner fee → net. All four packages are computed in parallel.",
+  selected:"Selected package",client_price:"Client price",vat:"VAT",gross:"Total incl. VAT",
+  cost:"Team cost",ext:"External costs",mult:"Combined multiplier",margin:"Margin",
+  partner_fee:"Partner fee",net:"Net Velway",eff_rate:"Effective rate",per_day:"€/day",
+  hours:"Hours by role",role:"Role",h:"Hours",d:"Days",rate:"Rate",costc:"Cost, €",total:"Total",
+  multiplierbreak:"Multipliers",timeline:"Timeline estimate",weeks:"weeks",
+  compare:"Package comparison",min_applied:"package minimum applied",
+  pay:"Payment schedule",export:"Export table (CSV)",exportNo:"Export unavailable in this view",
+  scen:"Scenarios: price by number of departments / workflows",scenSub:"Same client and settings, only scope changes. The option closest to the target price is highlighted.",
+  target:"Target price, €",units:"Departments / workflows",calib:"Calibrate the department norm to a target price",
+  calibText:(n,pr,k,hrs)=>`For ${n} department${n===1?"":"s"} to cost ${pr} € at the current margin and multipliers, the per-department norm must be ×${k} of today's: ${hrs}.`,
+  calibNo:"Target price is below the package's fixed part — unreachable without changing margin or minimum.",
+  apply:"Apply this norm",applied:"Norm updated",
+  linesL:{prep:"Preparation (brief, questionnaires)",kickoff:"Strategic session with owner / CEO",areas:"Work per department / workflow",interviews:"Extra interviews",usecases:"AI use case development",prio:"Prioritisation, impact/effort matrix",roadmap:"Roadmap",kpi:"Budgets and KPIs for top-5",doc:"Documentation / compendium",present:"Presentation and Q&A",facil:"Workshop facilitation"}},
+ capacity:{title:"Capacity planner",sub:"How many parallel projects the team can carry. Required days by role vs. available per month.",
+  team:"Team",people:"People",days:"Working days/month per person",util:"Utilisation, %",avail:"Available days/month",
+  projects:"Projects in flight",name:"Project",pkg:"Package",units:"Depts/workflows",weeks:"Weeks",add:"Add current estimate",del:"Remove",
+  load:"Monthly load by role",need:"Needed",over:"overloaded",ok:"headroom",empty:"Add projects to see the load."},
+ risks:{title:"Risk checklist",sub:"Go through before signing. Red summary — think twice.",summary:"Summary",
+  lvl:{High:"High",Medium:"Medium",Low:"Low"},
+  verdict:{stop:"STOP. Reconsider terms or decline.",caution:"Caution. Protect yourself in the contract.",many:"Many medium risks. Tighten the contract.",ok:"OK — proceed."}},
+ proposal:{title:"Proposal",sub:"Text is generated from Client and Result. Copy into an email or document.",lang:"Proposal language",copy:"Copy text",copied:"Copied"},
+ settings:{title:"Settings",sub:"All rates, norms and multipliers. Changes apply instantly and persist in this browser.",
+  rates:"Role rates (internal cost)",roles:{ba:"Business analyst",pm:"Project manager",tl:"Tech lead",arch:"Architect"},
+  hpd:"Hours per day",buffer:"Overrun buffer, %",
+  margins:"Target gross margin per package, %",mins:"Package minimum price, €",
+  norms:"Norm per department / area (hours)",normsub:"2h session (BA) + 3h analysis (BA) + 5h per role",
+  wfactor:"Workflow factor (share of the department norm)",
+  fixed:"Fixed package hours (independent of department count)",
+  addons:"Add-ons (hours by role or fixed price)",addon:"Add-on",fixedPrice:"Fixed price, € (0 = compute from hours)",
+  country:"Country multipliers",vertical:"Vertical multipliers",size:"Client size multipliers",urgency:"Urgency multipliers",
+  maturity:"AI maturity multipliers",partner:"Partner options",fx:"FX rates (1 EUR =)",legal:"Contracting entities",vatRate:"VAT, %",
+  payterms:"Payment terms",label:"Label",value:"Value",mult:"Multiplier",comment:"Comment",
+  reset:"Reset to defaults",resetQ:"Reset all settings to defaults?",
+  pA:"A — % of consultancy services",pB_fixed:"B — fixed fee per discovery, €",pB_pct:"B — % of implementation SOW",
+  pC:"C — white label (partner marks up)"}
+}};
+
+/* ===================== defaults ===================== */
+const ROLES=["ba","pm","tl","arch"];
+const DEF_SETTINGS=()=>({
+ rates:{ba:40,pm:30,tl:70,arch:100}, hpd:8, buffer:10,
+ margin:{workshop:60,express:60,discovery:60,premium:60},
+ minPrice:{workshop:1500,express:3000,discovery:6000,premium:12000},
+ norm:{session:2,analysis:3,ba:5,pm:5,tl:5,arch:5},
+ wfFactor:0.65,
+ fixed:{
+  workshop:{prep:{ba:4,pm:2,tl:1,arch:0},present:{ba:3,pm:1,tl:1,arch:0}},
+  express:{prep:{ba:1,pm:1,tl:0,arch:0},kickoff:{ba:1,pm:0,tl:0,arch:0},prio:{ba:1,pm:0,tl:0,arch:0},roadmap:{ba:2,pm:0,tl:0,arch:1},doc:{ba:2,pm:0,tl:0,arch:0},present:{ba:1,pm:0,tl:0,arch:0}},
+  discovery:{prep:{ba:2,pm:1,tl:0,arch:0},kickoff:{ba:2,pm:1,tl:1,arch:1},prio:{ba:2,pm:0,tl:0,arch:1},roadmap:{ba:3,pm:0,tl:1,arch:2},kpi:{ba:0,pm:0,tl:0,arch:0},doc:{ba:3,pm:1,tl:0,arch:0},present:{ba:2,pm:1,tl:0,arch:0}},
+  premium:{prep:{ba:2,pm:1,tl:0,arch:0},kickoff:{ba:2,pm:1,tl:1,arch:1},prio:{ba:2,pm:0,tl:0,arch:1},roadmap:{ba:3,pm:0,tl:1,arch:2},kpi:{ba:0,pm:0,tl:0,arch:0},doc:{ba:3,pm:1,tl:0,arch:0},present:{ba:2,pm:1,tl:0,arch:0}}
+ },
+ facilDay:{ba:8,pm:1,tl:6,arch:2},     // per workshop day
+ interview:{ba:1.5,pm:0.25,tl:0.5,arch:0},   // per extra interview
+ usecase:{ba:0.6,pm:0,tl:0.2,arch:0.2},       // per use case above package base
+ ucBase:{workshop:0,express:5,discovery:10,premium:10},
+ roadmapF:{"6":0.7,"12":1,"18":1.3,"24":1.6},
+ addons:[
+  {id:"techscope",uk:"Technical Scope for Application (grant)",en:"Technical Scope for Application (grant)",h:{ba:4,pm:0,tl:6,arch:6},fixed:0,incl:[]},
+  {id:"onsite",uk:"On-site стратегічна сесія (1 день)",en:"On-site strategic session (1 day)",h:{ba:8,pm:1,tl:6,arch:2},fixed:0,incl:[]},
+  {id:"leadership",uk:"Воркшоп з керівництвом (онлайн, 3 год)",en:"Leadership workshop (online, 3h)",h:{ba:4,pm:0,tl:2,arch:1},fixed:0,incl:[]},
+  {id:"rfp",uk:"Детальні RFP для топ-3 пілотів",en:"Detailed RFPs for top-3 pilots",h:{ba:6,pm:2,tl:12,arch:12},fixed:0,incl:["premium"]},
+  {id:"supervision",uk:"Супервізія пілота (3 міс, щомісячні check-ins)",en:"Pilot supervision (3 months, monthly check-ins)",h:{ba:2,pm:12,tl:6,arch:6},fixed:0,incl:["premium"]},
+  {id:"vendor",uk:"Вибір вендора / інтегратора",en:"Vendor / integrator selection",h:{ba:4,pm:1,tl:3,arch:6},fixed:0,incl:["premium"]},
+  {id:"training",uk:"AI-навчання команди (2 год + матеріали)",en:"AI training for team (2h + materials)",h:{ba:5,pm:0,tl:1,arch:0},fixed:0,incl:["premium"]}
+ ],
+ country:[
+  {k:"Ukraine",m:0.7,c:"EUR"},{k:"Poland",m:1.0,c:"PLN"},{k:"Portugal",m:1.0,c:"EUR"},{k:"Romania",m:1.0,c:"EUR"},{k:"Czechia / Slovakia",m:1.0,c:"EUR"},
+  {k:"Croatia",m:1.0,c:"EUR"},{k:"Latvia / Baltics",m:1.0,c:"EUR"},{k:"Finland",m:1.2,c:"EUR"},{k:"Spain / Italy",m:1.2,c:"EUR"},{k:"Greece",m:1.1,c:"EUR"},
+  {k:"Germany / Austria",m:1.4,c:"EUR"},{k:"France / Benelux",m:1.4,c:"EUR"},{k:"Nordics (SE/DK/NO)",m:1.5,c:"EUR"},{k:"United Kingdom",m:1.5,c:"GBP"},
+  {k:"Switzerland",m:1.7,c:"CHF"},{k:"UAE / Middle East",m:1.7,c:"USD"},{k:"USA",m:2.0,c:"USD"},{k:"Canada",m:1.7,c:"USD"}
+ ],
+ vertical:[
+  {k:"Industrial & Manufacturing",m:1.0},{k:"Document & Knowledge Operations",m:1.0},{k:"Customer Operations",m:1.0},
+  {k:"Logistics & Maritime",m:1.0},{k:"Finance / Banking",m:1.4},{k:"Healthcare / Pharma",m:1.5},{k:"Government / NGO",m:1.3},{k:"Other",m:1.0}
+ ],
+ size:[
+  {k:"Small (<20)",m:0.85},{k:"SME (20–100)",m:1.0},{k:"Mid-size (100–500)",m:1.2},{k:"Enterprise (500+)",m:1.4},{k:"International group",m:1.6}
+ ],
+ urgency:[
+  {k:"Standard (3–6 weeks)",m:1.0},{k:"Accelerated (2–3 weeks)",m:1.2},{k:"Rush (<2 weeks)",m:1.4},{k:"Flexible (6+ weeks)",m:0.95}
+ ],
+ maturity:[
+  {k:"Low — no data discipline, no AI tools",m:1.2},{k:"Medium — some tools, partial data",m:1.0},{k:"High — systematic, clean data",m:0.9}
+ ],
+ langs:[{k:"EN",ok:true},{k:"UA",ok:true},{k:"PL",ok:false},{k:"DE",ok:false},{k:"ES",ok:false},{k:"EL",ok:false},{k:"Other",ok:false}],
+ partner:{aPct:10,bFixed:1000,bPct:2},
+ fx:[{k:"EUR",r:1},{k:"USD",r:1.08},{k:"GBP",r:0.85},{k:"PLN",r:4.3},{k:"UAH",r:45.5},{k:"CHF",r:0.95}],
+ legal:[{k:"Velway (LT, VAT payer)",vat:21,uk:"Velway AI Solutions, Литва. Ціни без ПДВ; ПДВ застосовується згідно з правилами ЄС (reverse charge для B2B в ЄС).",en:"Velway AI Solutions, Lithuania. Prices exclude VAT; VAT applied per EU rules (reverse charge for EU B2B)."},
+         {k:"IT Dev Solutions (UA sole proprietor)",vat:0,uk:"ФОП, спрощена система. Ціни без податків.",en:"Ukrainian sole proprietor, simplified tax regime. Prices are net of taxes."},
+         {k:"Other",vat:0,uk:"",en:""}],
+ payterms:[{k:"50 / 50",s:[50,50]},{k:"40 / 30 / 30",s:[40,30,30]},{k:"30 / 40 / 30",s:[30,40,30]},{k:"100% upfront",s:[100]}],
+ capacity:{team:{ba:{n:2,d:20,u:75},pm:{n:1,d:20,u:60},tl:{n:1,d:20,u:50},arch:{n:1,d:20,u:40}}}
+});
+const DEF_INPUT=()=>({
+ company:"Przykład Sp. z o.o. (example)",contact:"Marek Nowak, COO",email:"",date:"",start:"",
+ country:"Poland",vertical:"Industrial & Manufacturing",size:"SME (20–100)",urgency:"Standard (3–6 weeks)",
+ maturity:"Medium — some tools, partial data",lang:"EN",channel:"referral",cur:"EUR",
+ budget:"",dm:"",nda:"No",legal:"Velway (LT, VAT payer)",pay:"50 / 50",partner:"B",
+ pkg:"discovery",unit:"dept",nDept:3,nWf:3,interviews:0,roadmap:"12",usecases:10,wdays:1,
+ addons:{},travel:0,
+ risks:{},
+ projects:[]
+});
+const RISKS=[
+ ["Клієнт активно торгується / ріже скоуп","Client actively negotiates / keeps cutting scope","High","Зафіксуйте скоуп у контракті детально. Розширення — окремий інвойс.","Lock scope in the contract. Any extension — separate invoice."],
+ ["Немає чіткої особи, що ухвалює рішення","No clear decision maker","High","Назвіть контактну особу в контракті. Без неї не стартуйте.","Name a point of contact in the contract. Don't start without one."],
+ ["Багато стейкхолдерів, немає одного власника","Many stakeholders, no single owner","High","Правки приймаються лише від однієї особи.","Revisions accepted only from one person."],
+ ["Іноземна юрисдикція клієнта","Client in a foreign jurisdiction","Medium","Перевірте юрисдикцію, валюту, податки.","Check jurisdiction, currency, taxes."],
+ ["Оплата не в EUR/USD","Payment in non-EUR/USD currency","Medium","Зафіксуйте курс у контракті.","Lock the FX rate in the contract."],
+ ["Клієнт не може сформулювати проблему / мету","Client can't define a concrete problem / goal","High","Discovery call перед оцінкою. Без мети — не беріть.","Discovery call before estimate. No goal — don't take it."],
+ ["Нереалістичний дедлайн (<2 тижнів)","Unrealistic deadline (<2 weeks)","Medium","Відмова або множник Rush.","Decline or apply the Rush multiplier."],
+ ["Працював з кількома консультантами без результату","Worked with multiple consultants without results","High","Red flag — або не доводить до кінця.","Red flag — may not follow through."],
+ ["Бюджет не озвучено","No budget disclosed","Medium","Запитайте прямо про діапазон.","Ask directly for a range."],
+ ["Бюджет значно нижче мінімуму","Budget significantly below minimum","High","Зменшити скоуп (Workshop/Express) або відмовитись.","Reduce scope (Workshop/Express) or decline."],
+ ["Незвичні / агресивні вимоги NDA","Unusual / aggressive NDA requirements","Medium","Показати юристу.","Show to a lawyer."],
+ ["On-site в іншій країні","On-site work in another country","Medium","Додати відрядження + add-on on-site.","Add travel + on-site add-on."],
+ ["Оплата лише після завершення","Client wants to pay only after completion","High","Лише 50/50 або 40/30/30.","Only 50/50 or 40/30/30."],
+ ["Державна установа / NGO","Government / NGO entity","Medium","Перевірте терміни оплати (60+ днів).","Check payment terms (60+ days)."],
+ ["Очікує участі у впровадженні","Expects participation in implementation","Low","Впровадження — окремий контракт.","Implementation is a separate contract."],
+ ["Конфлікт інтересів","Conflict of interest","High","Перевірити, розкрити або відмовитись.","Verify; disclose or decline."],
+ ["Очікує гарантований ROI","Expects guaranteed ROI","High","Стратегія = рекомендації, не гарантії.","Strategy = recommendations, not guarantees."],
+ ["Чутливі дані (healthcare, finance, неповнолітні)","Sensitive data (healthcare, finance, minors)","Medium","GDPR / compliance. Бюджет на legal review.","GDPR / compliance. Budget for legal review."],
+ ["Грантовий клієнт: implementation залежить від award","Grant-funded client: implementation depends on award","Medium","Discovery оплачується до подачі заявки; implementation — після рішення.","Discovery paid before filing; implementation after the award decision."]
+];
+
+/* ===================== state ===================== */
+let S, I, ui={page:"client",mode:"internal",lang:"uk",proposalLang:"uk",target:15000,calibN:6};
+function load(){
+ S=DEF_SETTINGS(); I=DEF_INPUT();
+ try{
+  const s=JSON.parse(localStorage.getItem("velway.calc.v2.settings")||"null"); if(s) S=deepMerge(DEF_SETTINGS(),s);
+  const i=JSON.parse(localStorage.getItem("velway.calc.v2.input")||"null"); if(i) I=deepMerge(DEF_INPUT(),i);
+  const u=JSON.parse(localStorage.getItem("velway.calc.v2.ui")||"null"); if(u) ui=Object.assign(ui,u);
+ }catch(e){}
+}
+function save(){ try{
+  localStorage.setItem("velway.calc.v2.settings",JSON.stringify(S));
+  localStorage.setItem("velway.calc.v2.input",JSON.stringify(I));
+  localStorage.setItem("velway.calc.v2.ui",JSON.stringify(ui));
+ }catch(e){} }
+function deepMerge(a,b){ if(Array.isArray(b)) return b; if(b&&typeof b==="object"&&a&&typeof a==="object"){const o=Object.assign({},a); for(const k in b) o[k]=deepMerge(a[k],b[k]); return o;} return b===undefined?a:b; }
+const t=()=>T[ui.lang];
+
+/* ===================== model ===================== */
+const lk=(arr,k,f)=>{const x=arr.find(o=>o.k===k); return x?x[f]:undefined;};
+function zero(){return {ba:0,pm:0,tl:0,arch:0};}
+function addH(dst,src,f=1){for(const r of ROLES) dst[r]+= (src[r]||0)*f; return dst;}
+function calcPkg(pkg,inp,S){
+ const lines=[]; const H=zero();
+ const push=(id,h)=>{lines.push({id,h}); addH(H,h);};
+ const fx=S.fixed[pkg]||{};
+ if(pkg==="workshop"){
+  push("prep",fx.prep); const fac=zero(); addH(fac,S.facilDay,Math.max(1,inp.wdays||1)); push("facil",fac); push("present",fx.present);
+ } else {
+  push("prep",fx.prep); push("kickoff",fx.kickoff);
+  const nUnits = pkg==="express"?1:(inp.unit==="dept"?inp.nDept:inp.nWf);
+  const f = (pkg!=="express"&&inp.unit==="wf")?S.wfFactor:1;
+  const per={ba:S.norm.session+S.norm.analysis+S.norm.ba,pm:S.norm.pm,tl:S.norm.tl,arch:S.norm.arch};
+  const ar=zero(); addH(ar,per,nUnits*f); push("areas",ar);
+  if(inp.interviews>0){const iv=zero(); addH(iv,S.interview,inp.interviews); push("interviews",iv);}
+  const extraUC=Math.max(0,(inp.usecases||0)-(S.ucBase[pkg]||0)); if(extraUC>0&&pkg!=="express"){const u=zero(); addH(u,S.usecase,extraUC); push("usecases",u);}
+  push("prio",fx.prio);
+  const rf=S.roadmapF[inp.roadmap]||1; const rm=zero(); addH(rm,fx.roadmap,pkg==="express"?1:rf); push("roadmap",rm);
+  if(fx.kpi) push("kpi",fx.kpi);
+  push("doc",fx.doc); push("present",fx.present);
+ }
+ // add-ons
+ const addons=[]; let addFixed=0;
+ for(const a of S.addons){
+  const included=a.incl.includes(pkg); const chosen=!!inp.addons[a.id];
+  if(included||chosen){
+   if(a.fixed>0&&!included){addFixed+=a.fixed; addons.push({a,fixed:a.fixed,included});}
+   else {const h=zero(); addH(h,a.h); addH(H,h); addons.push({a,h,included});}
+  }
+ }
+ const buf=1+S.buffer/100;
+ const cost=ROLES.reduce((s,r)=>s+H[r]*S.rates[r],0)*buf;
+ const mult={country:lk(S.country,inp.country,"m")||1,vertical:lk(S.vertical,inp.vertical,"m")||1,size:lk(S.size,inp.size,"m")||1,urgency:lk(S.urgency,inp.urgency,"m")||1,maturity:lk(S.maturity,inp.maturity,"m")||1};
+ const M=Object.values(mult).reduce((a,b)=>a*b,1);
+ const margin=(S.margin[pkg]||0)/100;
+ const raw=cost*M/(1-margin);
+ const minP=S.minPrice[pkg]||0;
+ const price=Math.max(raw,minP)+addFixed+ (Number(inp.travel)||0);
+ const consult=Math.max(raw,minP)+addFixed;
+ const totalH=ROLES.reduce((s,r)=>s+H[r],0)*buf;
+ const days=totalH/S.hpd;
+ // partner
+ let pfee=0; const P=inp.partner;
+ if(P==="A") pfee=consult*S.partner.aPct/100; else if(P==="B") pfee=S.partner.bFixed; else pfee=0;
+ const vatRate=lk(S.legal,inp.legal,"vat")||0;
+ const weeks = pkg==="workshop"?[1,2]:pkg==="express"?[2,3]:pkg==="discovery"?[3,6]:[6,10];
+ return {pkg,lines,H,addons,cost,mult,M,margin,raw,minP,minApplied:raw<minP,addFixed,price,consult,pfee,net:price-pfee-(Number(inp.travel)||0),totalH,days,buf,vatRate,weeks};
+}
+function calcAll(){ const o={}; for(const p of ["workshop","express","discovery","premium"]) o[p]=calcPkg(p,I,S); return o; }
+const fmt=(n,d=0)=>Number(n||0).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:d}).replace(/,/g," ");
+const money=(n,cur)=>{cur=cur||I.cur; const r=lk(S.fx,cur,"r")||1; return fmt(n*r)+" "+cur;};
+const langOK=()=>{const l=S.langs.find(x=>x.k===I.lang); return l?l.ok:false;};
+
+/* ===================== rendering ===================== */
+const $=(s,el=document)=>el.querySelector(s);
+const h=(s)=>{const d=document.createElement("div"); d.innerHTML=s.trim(); return d.firstChild;};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function opts(arr,val,key="k",label=null){return arr.map(o=>{const k=typeof o==="string"?o:o[key]; const l=label?label(o):k; return `<option value="${esc(k)}" ${k==val?"selected":""}>${esc(l)}</option>`;}).join("");}
+function inpN(path,val,step="1",attrs=""){return `<input type="number" step="${step}" data-path="${path}" value="${val}" ${attrs}>`;}
+
+function render(){
+ document.body.classList.toggle("partner",ui.mode==="partner");
+ document.documentElement.lang=ui.lang;
+ const tt=t();
+ // nav
+ const pages=["client","scope","result","capacity","risks","proposal","settings"];
+ const vis=pages.filter(p=>ui.mode==="internal"||!["capacity","settings"].includes(p));
+ if(!vis.includes(ui.page)) ui.page="client";
+ const navHTML=vis.map(p=>`<button data-p="${p}" class="${ui.page===p?"on":""}">${tt.nav[p]}</button>`).join("");
+ $("#nav").innerHTML=navHTML; $("#tabs").innerHTML=navHTML;
+ $("#lblMode").textContent=tt.mode; $("#lblLang").textContent=tt.lang; $("#foot").textContent=tt.foot;
+ $("#modeSeg").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.m===ui.mode));
+ $("#langSeg").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.l===ui.lang));
+ const R=calcAll();
+ const main=$("#main"); main.innerHTML="";
+ main.appendChild(({client:pClient,scope:pScope,result:pResult,capacity:pCapacity,risks:pRisks,proposal:pProposal,settings:pSettings})[ui.page](R));
+ renderSumbar(R);
+ bind(main);
+ save();
+}
+function renderSumbar(R){
+ const tt=t().result; const r=R[I.pkg]; const ok=langOK();
+ $("#sumbar").innerHTML = ok
+  ? `<span class="dim">${t().scope.pkgs[I.pkg]}</span><b>${money(r.price)}</b>
+     <span class="internal-only dim">cost ${fmt(r.cost)} € · net ${fmt(r.net)} €</span>
+     <span class="dim">${fmt(r.days,1)} ${tt.d.toLowerCase()} · ${r.weeks[0]}–${r.weeks[1]} ${tt.weeks}</span>`
+  : `<span class="pill bad">${t().client.langWarn}</span>`;
+}
+function card(title,inner,sub=""){return `<section class="card"><h2>${title}</h2>${sub?`<p class="sub" style="margin:-6px 0 12px">${sub}</p>`:""}${inner}</section>`;}
+function head(title,sub){return `<div class="topbar"><div><h1>${title}</h1><p class="sub">${sub}</p></div></div>`;}
+function field(label,inner,hint=""){return `<div class="field"><label>${label}</label>${inner}${hint?`<span class="hint">${hint}</span>`:""}</div>`;}
+
+function pClient(){
+ const c=t().client;
+ const partnerOpts=[{k:"none",l:c.partnerNone},{k:"A",l:"A — "+S.partner.aPct+"%"},{k:"B",l:"B — €"+S.partner.bFixed+" + "+S.partner.bPct+"%"},{k:"C",l:"C — white label"}];
+ return h(`<div class="page on">${head(c.title,c.sub)}
+ ${card(c.basic,`<div class="grid">
+  ${field(c.company,`<input type="text" data-i="company" value="${esc(I.company)}">`)}
+  ${field(c.contact,`<input type="text" data-i="contact" value="${esc(I.contact)}">`)}
+  ${field(c.email,`<input type="text" data-i="email" value="${esc(I.email)}">`)}
+  ${field(c.date,`<input type="date" data-i="date" value="${esc(I.date)}">`)}
+  ${field(c.start,`<input type="date" data-i="start" value="${esc(I.start)}">`)}
+ </div>`)}
+ ${card(c.params,`<div class="grid">
+  ${field(c.country,`<select data-i="country">${opts(S.country,I.country,"k",o=>o.k+" · ×"+o.m)}</select>`)}
+  ${field(c.vertical,`<select data-i="vertical">${opts(S.vertical,I.vertical,"k",o=>o.k+" · ×"+o.m)}</select>`)}
+  ${field(c.size,`<select data-i="size">${opts(S.size,I.size,"k",o=>o.k+" · ×"+o.m)}</select>`)}
+  ${field(c.urgency,`<select data-i="urgency">${opts(S.urgency,I.urgency,"k",o=>o.k+" · ×"+o.m)}</select>`)}
+  ${field(c.maturity,`<select data-i="maturity">${opts(S.maturity,I.maturity,"k",o=>o.k+" · ×"+o.m)}</select>`)}
+  ${field(c.lang,`<select data-i="lang">${opts(S.langs,I.lang,"k",o=>o.k+(o.ok?"":" — n/a"))}</select>`)}
+  ${field(c.channel,`<select data-i="channel">${opts([{k:"referral"},{k:"direct"}],I.channel,"k",o=>c.channels[o.k])}</select>`)}
+  ${field(c.cur,`<select data-i="cur">${opts(S.fx,I.cur)}</select>`)}
+ </div>${langOK()?"":`<div class="note bad">${c.langWarn}</div>`}`)}
+ ${card(c.ctx,`<div class="grid">
+  ${field(c.legal,`<select data-i="legal">${opts(S.legal,I.legal)}</select>`)}
+  ${field(c.pay,`<select data-i="pay">${opts(S.payterms,I.pay)}</select>`)}
+  ${field(c.partner,`<select data-i="partner">${opts(partnerOpts,I.partner,"k",o=>o.l)}</select>`)}
+  ${field(c.budget,`<input type="text" data-i="budget" value="${esc(I.budget)}">`)}
+  ${field(c.dm,`<input type="text" data-i="dm" value="${esc(I.dm)}">`)}
+  ${field(c.nda,`<select data-i="nda">${opts(["No","Yes"],I.nda)}</select>`)}
+ </div>`)}
+ </div>`);
+}
+function pScope(R){
+ const s=t().scope; const r=t().result;
+ const pk=["workshop","express","discovery","premium"].map(p=>{const x=R[p]; return `<div class="pkg ${I.pkg===p?"on":""}" data-pkg="${p}">
+   <div class="name">${s.pkgs[p]}</div><div class="price">${langOK()?money(x.price):"—"}</div>
+   <div class="meta">${s.pkgd[p]}</div><div class="meta">${x.weeks[0]}–${x.weeks[1]} ${r.weeks} · ${fmt(x.days,1)} ${r.d.toLowerCase()}</div>
+   <div class="cost internal-only">cost ${fmt(x.cost)} € · net ${fmt(x.net)} €</div></div>`;}).join("");
+ const isW=I.pkg==="workshop", isE=I.pkg==="express";
+ const addons=S.addons.map(a=>{const incl=a.incl.includes(I.pkg); const on=incl||!!I.addons[a.id]; const hh=ROLES.reduce((x,k)=>x+a.h[k],0);
+  return `<div class="chk"><input type="checkbox" data-addon="${a.id}" ${on?"checked":""} ${incl?"disabled":""}>
+   <div style="flex:1"><div>${esc(a[ui.lang])} ${incl?`<span class="pill">${s.incl}</span>`:""}</div>
+   <div class="what">${a.fixed>0?a.fixed+" € "+s.fixed:hh+" "+s.hours+" (BA "+a.h.ba+" · PM "+a.h.pm+" · TL "+a.h.tl+" · Arch "+a.h.arch+")"}</div></div></div>`;}).join("");
+ return h(`<div class="page on">${head(s.title,s.sub)}
+ ${card(s.pkg,`<div class="pkgs">${pk}</div>`)}
+ ${card(s.unit,`<div class="grid">
+  ${field(s.unit,`<select data-i="unit" ${isW||isE?"disabled":""}>${opts([{k:"dept"},{k:"wf"}],I.unit,"k",o=>s.units[o.k])}</select>`)}
+  ${I.unit==="dept"?field(s.n_dept,inpN("I.nDept",I.nDept,"1",`min="1" ${isW||isE?"disabled":""}`),isE?"Express = 1":""):field(s.n_wf,inpN("I.nWf",I.nWf,"1",`min="1" ${isW||isE?"disabled":""}`),isE?"Express = 1":"")}
+  ${field(s.interviews,inpN("I.interviews",I.interviews,"1",`min="0" ${isW?"disabled":""}`))}
+  ${field(s.roadmap,`<select data-i="roadmap" ${isW||isE?"disabled":""}>${opts([{k:"6"},{k:"12"},{k:"18"},{k:"24"}],I.roadmap,"k",o=>o.k+" mo")}</select>`)}
+  ${field(s.usecases,inpN("I.usecases",I.usecases,"1",`min="0" ${isW||isE?"disabled":""}`),"base: "+S.ucBase[I.pkg])}
+  ${field(s.wdays,inpN("I.wdays",I.wdays,"1",`min="1" max="3" ${isW?"":"disabled"}`))}
+ </div>`)}
+ ${card(s.addons,addons+`<div class="grid" style="margin-top:14px">${field(s.travel,inpN("I.travel",I.travel,"50",'min="0"'))}</div>`)}
+ </div>`);
+}
+function pResult(R){
+ const r=t().result; const x=R[I.pkg]; const ok=langOK(); const sr=t().settings.roles;
+ if(!ok) return h(`<div class="page on">${head(r.title,r.sub)}<div class="note bad">${t().client.langWarn}</div></div>`);
+ const vat=x.price*x.vatRate/100;
+ const pay=(lk(S.payterms,I.pay,"s")||[100]).map((p,i)=>`<div>${i+1} · ${p}%</div><div class="n">${money(x.price*p/100)}</div>`).join("");
+ const lines=x.lines.map(l=>`<tr><td>${r.linesL[l.id]}</td>${ROLES.map(k=>`<td class="n">${fmt(l.h[k],1)}</td>`).join("")}<td class="n">${fmt(ROLES.reduce((a,k)=>a+l.h[k],0),1)}</td></tr>`).join("")
+  + x.addons.map(a=>`<tr><td>+ ${esc(a.a[ui.lang])}${a.included?` <span class="pill">${t().scope.incl}</span>`:""}</td>${a.h?ROLES.map(k=>`<td class="n">${fmt(a.h[k],1)}</td>`).join("")+`<td class="n">${fmt(ROLES.reduce((s,k)=>s+a.h[k],0),1)}</td>`:`<td colspan="5" class="n">${fmt(a.fixed)} € ${t().scope.fixed}</td>`}</tr>`).join("");
+ const roles=ROLES.map(k=>`<tr><td>${sr[k]}</td><td class="n">${fmt(x.H[k]*x.buf,1)}</td><td class="n">${fmt(x.H[k]*x.buf/S.hpd,1)}</td><td class="n internal-only">${S.rates[k]}</td><td class="n internal-only">${fmt(x.H[k]*x.buf*S.rates[k])}</td></tr>`).join("");
+ const cmp=["workshop","express","discovery","premium"].map(p=>{const y=R[p]; return `<tr><td>${t().scope.pkgs[p]} ${y.minApplied?`<span class="pill warn">${r.min_applied}</span>`:""}</td><td class="n">${fmt(y.totalH,1)}</td><td class="n">${fmt(y.days,1)}</td><td class="n internal-only">${fmt(y.cost)}</td><td class="n">${money(y.price)}</td><td class="n internal-only">${fmt(y.pfee)}</td><td class="n internal-only">${fmt(y.net)}</td><td class="n">${y.weeks[0]}–${y.weeks[1]}</td></tr>`;}).join("");
+ return h(`<div class="page on">${head(r.title,r.sub)}
+ <div class="hero">
+  <section class="card"><h2>${r.selected}: ${t().scope.pkgs[I.pkg]}</h2>
+   <div class="sm">${r.client_price}</div><div class="bigprice">${money(x.price)}</div>
+   ${I.cur!=="EUR"?`<div class="sm">= ${fmt(x.price)} EUR</div>`:""}
+   ${x.vatRate>0?`<div class="kv" style="margin-top:8px"><div>${r.vat} ${x.vatRate}%</div><div class="n">${money(vat)}</div><div>${r.gross}</div><div class="n">${money(x.price+vat)}</div></div>`:""}
+   <div class="kv" style="margin-top:14px"><div>${r.timeline}</div><div class="n">${x.weeks[0]}–${x.weeks[1]} ${r.weeks}</div><div>${r.total} ${r.h.toLowerCase()} / ${r.d.toLowerCase()}</div><div class="n">${fmt(x.totalH,1)} / ${fmt(x.days,1)}</div></div>
+   <h2>${r.pay} (${I.pay})</h2><div class="kv">${pay}</div>
+  </section>
+  <section class="card internal-only"><h2>Cost → price → net</h2>
+   <div class="kv">
+    <div>${r.cost} (+${S.buffer}% buffer)</div><div class="n">${fmt(x.cost)} €</div>
+    <div>${r.mult}</div><div class="n">×${fmt(x.M,3)}</div>
+    <div>${r.margin}</div><div class="n">${S.margin[I.pkg]}%</div>
+    <div>${x.minApplied?r.min_applied:"→"}</div><div class="n">${fmt(Math.max(x.raw,x.minP))} €</div>
+    ${x.addFixed?`<div>+ add-ons (${t().scope.fixed})</div><div class="n">${fmt(x.addFixed)} €</div>`:""}
+    ${I.travel?`<div>+ ${r.ext}</div><div class="n">${fmt(I.travel)} €</div>`:""}
+    <div class="tot">${r.client_price}</div><div class="n tot">${fmt(x.price)} €</div>
+    <div>− ${r.partner_fee} (${I.partner==="none"?"—":I.partner})</div><div class="n">${fmt(x.pfee)} €</div>
+    ${I.travel?`<div>− ${r.ext}</div><div class="n">${fmt(I.travel)} €</div>`:""}
+    <div class="tot">${r.net}</div><div class="n tot">${fmt(x.net)} €</div>
+    <div>${r.eff_rate}</div><div class="n">${fmt(x.consult/x.totalH)} €/h · ${fmt(x.consult/x.days)} ${r.per_day}</div>
+   </div>
+   <div class="sm" style="margin-top:10px">${r.multiplierbreak}: ${Object.entries(x.mult).map(([k,v])=>k+" ×"+v).join(" · ")}</div>
+   ${I.partner==="C"?`<div class="note" style="margin-top:10px">${t().settings.pC}</div>`:""}
+  </section>
+ </div>
+ ${card(r.hours,`<div class="tbl-wrap"><table><thead><tr><th>${r.role}</th><th class="n">${r.h}</th><th class="n">${r.d}</th><th class="n internal-only">${r.rate} €/h</th><th class="n internal-only">${r.costc}</th></tr></thead><tbody>${roles}</tbody></table></div>
+  <div class="tbl-wrap" style="margin-top:16px"><table><thead><tr><th></th><th class="n">BA</th><th class="n">PM</th><th class="n">TL</th><th class="n">Arch</th><th class="n">Σ</th></tr></thead><tbody>${lines}</tbody></table></div>`)}
+ ${card(r.scen,scenarioHTML(R),r.scenSub)}
+ ${card(r.compare,`<div class="tbl-wrap"><table><thead><tr><th></th><th class="n">${r.h}</th><th class="n">${r.d}</th><th class="n internal-only">Cost €</th><th class="n">${r.client_price}</th><th class="n internal-only">${r.partner_fee}</th><th class="n internal-only">${r.net}</th><th class="n">${r.weeks}</th></tr></thead><tbody>${cmp}</tbody></table></div>
+  <div class="row" style="margin-top:12px"><button class="btn" id="btnExport">${r.export}</button><span class="sm" id="exportMsg"></span></div>`)}
+ </div>`);
+}
+function priceFor(pkg,n){const inp=Object.assign({},I); if(I.unit==="dept") inp.nDept=n; else inp.nWf=n; return calcPkg(pkg,inp,S);}
+function scenarioHTML(R){
+ const r=t().result; const pk=["workshop","express","discovery","premium"]; const N=[1,2,3,4,5,6,8,10];
+ const rows={}; for(const p of pk) rows[p]=N.map(n=>priceFor(p,n).price);
+ const tgt=Number(ui.target)||0;
+ let best=null; for(const p of ["discovery","premium"]) rows[p].forEach((v,i)=>{const d=Math.abs(v-tgt); if(!best||d<best.d) best={p,i,d};});
+ const head=`<tr><th>${r.units}</th>${N.map(n=>`<th class="n">${n}</th>`).join("")}</tr>`;
+ const body=pk.map(p=>`<tr><td>${t().scope.pkgs[p]}${p==="workshop"||p==="express"?` <span class="sm">(${ui.lang==="uk"?"не залежить":"n/a"})</span>`:""}</td>${rows[p].map((v,i)=>{const hit=best&&best.p===p&&best.i===i; const cur=(I.unit==="dept"?I.nDept:I.nWf)===N[i]&&p===I.pkg; return `<td class="n" style="${hit?"background:var(--mint);font-weight:600":""}${cur?";outline:1px solid var(--teal)":""}">${p==="workshop"||p==="express"?(i===0?money(v):"·"):money(v)}</td>`;}).join("")}</tr>`).join("");
+ // calibration
+ const n=Math.max(1,Number(ui.calibN)||6); const base=priceFor("discovery",0); const withN=priceFor("discovery",n);
+ const M=withN.M, m=(S.margin.discovery||0)/100, buf=1+S.buffer/100;
+ const fixedCost=base.cost; const perDept=(withN.cost-base.cost)/n; // buffered
+ const needCost=tgt*(1-m)/M - (withN.addFixed+(Number(I.travel)||0))*(1-m)/M;
+ const k=perDept>0?(needCost-fixedCost)/(n*perDept):0;
+ const f=(I.unit==="wf")?S.wfFactor:1;
+ const hrs=`BA ${fmt((S.norm.session+S.norm.analysis+S.norm.ba)*k*f,1)}h · PM ${fmt(S.norm.pm*k*f,1)}h · TL ${fmt(S.norm.tl*k*f,1)}h · Arch ${fmt(S.norm.arch*k*f,1)}h`;
+ const calib = k>0 ? `<p>${r.calibText(n,fmt(tgt),fmt(k,2),hrs)}</p><button class="btn ghost" id="btnApplyNorm" data-k="${k}">${r.apply}</button> <span class="sm" id="applyMsg"></span>` : `<p class="note bad">${r.calibNo}</p>`;
+ return `<div class="grid" style="margin-bottom:12px">${field(r.target,`<input type="number" step="500" id="inTarget" value="${tgt}">`)}${field(r.calib+" — "+r.units,`<input type="number" step="1" min="1" id="inCalibN" value="${n}">`)}</div>
+ <div class="tbl-wrap"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>
+ <div class="internal-only" style="margin-top:14px"><h2 style="margin-top:0">${r.calib}</h2>${calib}</div>`;
+}
+function pCapacity(R){
+ const c=t().capacity; const sr=t().settings.roles; const team=S.capacity.team;
+ const rows=ROLES.map(k=>{const tm=team[k]; const avail=tm.n*tm.d*tm.u/100; return `<tr><td>${sr[k]}</td><td class="n">${inpN(`S.capacity.team.${k}.n`,tm.n,"1")}</td><td class="n">${inpN(`S.capacity.team.${k}.d`,tm.d,"1")}</td><td class="n">${inpN(`S.capacity.team.${k}.u`,tm.u,"5")}</td><td class="n">${fmt(avail,1)}</td></tr>`;}).join("");
+ const need=zero();
+ const prj=I.projects.map((p,i)=>{const inp=Object.assign({},DEF_INPUT(),p.inp); const x=calcPkg(p.pkg,inp,S); const months=Math.max(0.5,(p.weeks||4)/4.33);
+  for(const k of ROLES) need[k]+= x.H[k]*x.buf/S.hpd/months;
+  return `<tr><td><input type="text" data-prj="${i}" data-f="name" value="${esc(p.name)}"></td><td><select data-prj="${i}" data-f="pkg">${opts([{k:"workshop"},{k:"express"},{k:"discovery"},{k:"premium"}],p.pkg,"k",o=>t().scope.pkgs[o.k])}</select></td><td class="n">${inp.unit==="dept"?inp.nDept:inp.nWf}</td><td class="n"><input type="number" data-prj="${i}" data-f="weeks" value="${p.weeks}" step="1" min="1"></td><td class="n">${fmt(x.days,1)}</td><td><button class="btn ghost" data-delprj="${i}">${c.del}</button></td></tr>`;}).join("");
+ const load=ROLES.map(k=>{const tm=team[k]; const avail=tm.n*tm.d*tm.u/100; const pct=avail?need[k]/avail*100:0; return `<div style="margin:8px 0"><div class="row" style="justify-content:space-between"><span>${sr[k]}</span><span class="sm">${c.need} ${fmt(need[k],1)} / ${fmt(avail,1)} ${c.days.split(" ")[0].toLowerCase()} · ${fmt(pct)}% <span class="pill ${pct>100?"bad":pct>85?"warn":""}">${pct>100?c.over:c.ok}</span></span></div><div class="bar"><i class="${pct>100?"over":""}" style="width:${Math.min(100,pct)}%"></i></div></div>`;}).join("");
+ return h(`<div class="page on">${head(c.title,c.sub)}
+ ${card(c.team,`<div class="tbl-wrap"><table><thead><tr><th></th><th class="n">${c.people}</th><th class="n">${c.days}</th><th class="n">${c.util}</th><th class="n">${c.avail}</th></tr></thead><tbody>${rows}</tbody></table></div>`)}
+ ${card(c.projects,`<div class="tbl-wrap"><table><thead><tr><th>${c.name}</th><th>${c.pkg}</th><th class="n">${c.units}</th><th class="n">${c.weeks}</th><th class="n">${t().result.d}</th><th></th></tr></thead><tbody>${prj||`<tr><td colspan="6" class="sm">${c.empty}</td></tr>`}</tbody></table></div>
+  <div class="row" style="margin-top:12px"><button class="btn" id="btnAddPrj">${c.add}</button></div>`)}
+ ${card(c.load,load)}
+ </div>`);
+}
+function pRisks(){
+ const c=t().risks; const li=ui.lang==="uk";
+ let hi=0,me=0,lo=0;
+ const rows=RISKS.map((r,i)=>{const on=!!I.risks[i]; if(on){if(r[2]==="High")hi++;else if(r[2]==="Medium")me++;else lo++;}
+  return `<div class="chk"><input type="checkbox" data-risk="${i}" ${on?"checked":""}><span class="lvl">${c.lvl[r[2]]}</span><div><div>${li?r[0]:r[1]}</div><div class="what">${li?r[3]:r[4]}</div></div></div>`;}).join("");
+ const v = hi>=3?["bad",c.verdict.stop]:hi>=1?["",c.verdict.caution]:me>=4?["",c.verdict.many]:["ok",c.verdict.ok];
+ return h(`<div class="page on">${head(c.title,c.sub)}
+ <section class="card"><div class="note ${v[0]}"><b>${c.summary}:</b> ${hi} ${c.lvl.High.toLowerCase()} · ${me} ${c.lvl.Medium.toLowerCase()} · ${lo} ${c.lvl.Low.toLowerCase()} — ${v[1]}</div>${rows}</section></div>`);
+}
+function proposalText(R){
+ const L=ui.proposalLang; const x=R[I.pkg]; const ok=langOK(); const cur=I.cur;
+ const m=n=>money(n,cur);
+ const legal=S.legal.find(o=>o.k===I.legal)||{}; const pay=(lk(S.payterms,I.pay,"s")||[100]);
+ const pk=(p)=>({workshop:{uk:"WORKSHOP (1–2 дні)",en:"WORKSHOP (1–2 days)"},express:{uk:"EXPRESS AUDIT (1 область, 2–3 тижні)",en:"EXPRESS AUDIT (1 area, 2–3 weeks)"},discovery:{uk:"AI DISCOVERY (повний аудит, 3–6 тижнів)",en:"AI DISCOVERY (full audit, 3–6 weeks)"},premium:{uk:"PREMIUM (з супервізією, 6–10 тижнів)",en:"PREMIUM (with supervision, 6–10 weeks)"}})[p][L];
+ const desc=(p)=>({workshop:{uk:"Стратегічна сесія з керівництвом: вирівнювання цілей, лонгліст AI-можливостей, рекомендовані наступні кроки.",en:"Strategic session with leadership: goal alignment, longlist of AI opportunities, recommended next steps."},
+  express:{uk:"Експрес-аналіз однієї ключової області: інтерв'ю, больові точки, 3–5 пріоритезованих AI use case'ів, короткий роадмап.",en:"Express analysis of one key area: interviews, pain points, 3–5 prioritised AI use cases, short roadmap."},
+  discovery:{uk:`Повний AI-аудит ${I.unit==="dept"?I.nDept+" ключових областей":I.nWf+" воркфлоу"}: інтерв'ю з керівниками, розробка AI use case'ів, пріоритезація, ${I.roadmap}-місячний роадмап, бюджети та KPI, фінальна презентація.`,en:`Full AI audit of ${I.unit==="dept"?I.nDept+" key areas":I.nWf+" workflows"}: interviews with leads, AI use case development, prioritisation, ${I.roadmap}-month roadmap, budgets and KPIs, final presentation.`},
+  premium:{uk:"AI Discovery + детальні RFP для топ-3 пілотів + 3 місяці супервізії впровадження, вибір вендора та навчання команди.",en:"AI Discovery + detailed RFPs for top-3 pilots + 3 months of implementation supervision, vendor selection and team training."}})[p][L];
+ const addons=x.addons.filter(a=>!a.included).map(a=>"• "+a.a[L==="uk"?"uk":"en"]).join("\n");
+ const payL=pay.length===1?(L==="uk"?"100% передоплата":"100% upfront"):pay.map((p,i)=>`${p}%`).join(" / ")+(L==="uk"?" (передоплата / етапи / після приймання)":" (upfront / milestones / on acceptance)");
+ if(L==="uk") return `Кому: ${I.contact||"—"} (${I.company||"—"})
+Тема: Пропозиція AI Discovery для ${I.company||"вашої компанії"}
+
+Добрий день!
+
+Дякуємо за інтерес до AI Discovery. Нижче — пропозиція для обраного формату та альтернативи.
+${legal.uk?"\n"+legal.uk+"\n":""}
+Параметри проєкту:
+Країна: ${I.country} · Вертикаль: ${I.vertical} · Розмір: ${I.size} · Терміновість: ${I.urgency}
+
+Рекомендований формат — ${pk(I.pkg)}: ${ok?m(x.price):"—"}
+${desc(I.pkg)}
+${addons?"\nДодатково включено:\n"+addons+"\n":""}
+Альтернативні формати:
+${["workshop","express","discovery","premium"].filter(p=>p!==I.pkg).map(p=>`• ${pk(p)}: ${ok?m(R[p].price):"—"} — ${desc(p)}`).join("\n")}
+
+Умови:
+• Оплата: ${payL}.
+• Робота дистанційно (Google Meet / Zoom); on-site сесії — окремий add-on.
+• Повний обсяг фіксується у Statement of Work (Додаток 1 до договору).
+• Запити поза узгодженим обсягом — окреме погодження.
+• NDA — за запитом. Пропозиція дійсна 14 днів.
+${x.vatRate>0?"• Ціни без ПДВ ("+x.vatRate+"%).":""}
+
+Будемо раді обговорити деталі.
+
+Dariia Danovska | AI Strategist, Velway AI Solutions`;
+ return `To: ${I.contact||"—"} (${I.company||"—"})
+Subject: AI Discovery proposal for ${I.company||"your company"}
+
+Hi,
+
+Thank you for your interest in AI Discovery. Below is the proposal for the recommended format plus alternatives.
+${legal.en?"\n"+legal.en+"\n":""}
+Project parameters:
+Country: ${I.country} · Vertical: ${I.vertical} · Size: ${I.size} · Urgency: ${I.urgency}
+
+Recommended format — ${pk(I.pkg)}: ${ok?m(x.price):"—"}
+${desc(I.pkg)}
+${addons?"\nAlso included:\n"+addons+"\n":""}
+Alternative formats:
+${["workshop","express","discovery","premium"].filter(p=>p!==I.pkg).map(p=>`• ${pk(p)}: ${ok?m(R[p].price):"—"} — ${desc(p)}`).join("\n")}
+
+Terms:
+• Payment: ${payL}.
+• Work delivered remotely (Google Meet / Zoom); on-site sessions are a separate add-on.
+• Full scope is fixed in the Statement of Work (Appendix 1 to the contract).
+• Requests beyond the agreed scope — separate agreement.
+• NDA available on request. Proposal valid for 14 days.
+${x.vatRate>0?"• Prices exclude VAT ("+x.vatRate+"%).":""}
+
+Happy to discuss the details.
+
+Dariia Danovska | AI Strategist, Velway AI Solutions`;
+}
+function pProposal(R){
+ const c=t().proposal;
+ return h(`<div class="page on">${head(c.title,c.sub)}
+ <section class="card"><div class="row" style="margin-bottom:10px"><label>${c.lang}</label><div class="seg" style="background:var(--teal-soft)"><button data-pl="uk" class="${ui.proposalLang==="uk"?"on":""}" style="color:var(--ink)">UA</button><button data-pl="en" class="${ui.proposalLang==="en"?"on":""}" style="color:var(--ink)">EN</button></div>
+ <button class="btn" id="btnCopy">${c.copy}</button><span class="sm" id="copyMsg"></span></div>
+ <textarea id="proposalText" style="min-height:520px">${esc(proposalText(R))}</textarea></section></div>`);
+}
+function pSettings(){
+ const c=t().settings;
+ const rates=ROLES.map(k=>`<tr><td>${c.roles[k]}</td><td class="n">${inpN("S.rates."+k,S.rates[k],"5")}</td></tr>`).join("");
+ const pk=["workshop","express","discovery","premium"];
+ const margins=pk.map(p=>`<tr><td>${t().scope.pkgs[p]}</td><td class="n">${inpN("S.margin."+p,S.margin[p],"5")}</td><td class="n">${inpN("S.minPrice."+p,S.minPrice[p],"100")}</td></tr>`).join("");
+ const norms=`<tr><td>${ui.lang==="uk"?"Стратегічна сесія (BA)":"Strategic session (BA)"}</td><td class="n">${inpN("S.norm.session",S.norm.session,"0.5")}</td></tr><tr><td>${ui.lang==="uk"?"Аналіз після сесії (BA)":"Post-session analysis (BA)"}</td><td class="n">${inpN("S.norm.analysis",S.norm.analysis,"0.5")}</td></tr>`+ROLES.map(k=>`<tr><td>${c.roles[k]}</td><td class="n">${inpN("S.norm."+k,S.norm[k],"0.5")}</td></tr>`).join("");
+ const fixedRows=pk.map(p=>Object.keys(S.fixed[p]).map(id=>`<tr><td>${t().scope.pkgs[p]}</td><td>${t().result.linesL[id]}</td>${ROLES.map(k=>`<td class="n">${inpN(`S.fixed.${p}.${id}.${k}`,S.fixed[p][id][k],"0.5")}</td>`).join("")}</tr>`).join("")).join("");
+ const perRows=[["facilDay",ui.lang==="uk"?"Фасилітація воркшопу, за день":"Workshop facilitation, per day"],["interview",ui.lang==="uk"?"Додаткове інтерв'ю, за одне":"Extra interview, each"],["usecase",ui.lang==="uk"?"Use case понад базу, за один":"Use case above base, each"]].map(([id,l])=>`<tr><td colspan="2">${l}</td>${ROLES.map(k=>`<td class="n">${inpN(`S.${id}.${k}`,S[id][k],"0.25")}</td>`).join("")}</tr>`).join("");
+ const addons=S.addons.map((a,i)=>`<tr><td><input type="text" data-path="S.addons.${i}.${ui.lang}" value="${esc(a[ui.lang])}"></td>${ROLES.map(k=>`<td class="n">${inpN(`S.addons.${i}.h.${k}`,a.h[k],"0.5")}</td>`).join("")}<td class="n">${inpN(`S.addons.${i}.fixed`,a.fixed,"100")}</td><td class="n"><label class="sm"><input type="checkbox" data-inclprem="${i}" ${a.incl.includes("premium")?"checked":""}> Premium</label></td></tr>`).join("");
+ const mtab=(key,title)=>card(title,`<div class="tbl-wrap"><table><thead><tr><th>${c.label}</th><th class="n">${c.mult}</th></tr></thead><tbody>${S[key].map((o,i)=>`<tr><td><input type="text" data-path="S.${key}.${i}.k" value="${esc(o.k)}"></td><td class="n">${inpN(`S.${key}.${i}.m`,o.m,"0.05")}</td></tr>`).join("")}</tbody></table></div>`);
+ return h(`<div class="page on">${head(c.title,c.sub)}
+ ${card(c.rates,`<div class="grid"><div><table><tbody>${rates}</tbody></table></div><div>${field(c.hpd,inpN("S.hpd",S.hpd,"1"))}<br>${field(c.buffer,inpN("S.buffer",S.buffer,"1"))}<br>${field(c.wfactor,inpN("S.wfFactor",S.wfFactor,"0.05"))}</div></div>`)}
+ ${card(c.margins,`<div class="tbl-wrap"><table><thead><tr><th></th><th class="n">${c.margins}</th><th class="n">${c.mins}</th></tr></thead><tbody>${margins}</tbody></table></div>`)}
+ ${card(c.norms,`<table><tbody>${norms}</tbody></table>`,c.normsub)}
+ ${card(c.fixed,`<div class="tbl-wrap"><table><thead><tr><th></th><th></th><th class="n">BA</th><th class="n">PM</th><th class="n">TL</th><th class="n">Arch</th></tr></thead><tbody>${fixedRows}${perRows}</tbody></table></div>`)}
+ ${card(c.addons,`<div class="tbl-wrap"><table><thead><tr><th>${c.addon}</th><th class="n">BA</th><th class="n">PM</th><th class="n">TL</th><th class="n">Arch</th><th class="n">${c.fixedPrice}</th><th></th></tr></thead><tbody>${addons}</tbody></table></div>`)}
+ ${mtab("country",c.country)}${mtab("vertical",c.vertical)}${mtab("size",c.size)}${mtab("urgency",c.urgency)}${mtab("maturity",c.maturity)}
+ ${card(c.partner,`<div class="grid">${field(c.pA,inpN("S.partner.aPct",S.partner.aPct,"1"))}${field(c.pB_fixed,inpN("S.partner.bFixed",S.partner.bFixed,"100"))}${field(c.pB_pct,inpN("S.partner.bPct",S.partner.bPct,"0.5"))}</div><p class="sm">${c.pC}</p>`)}
+ ${card(c.legal,`<div class="tbl-wrap"><table><thead><tr><th>${c.label}</th><th class="n">${c.vatRate}</th></tr></thead><tbody>${S.legal.map((o,i)=>`<tr><td><input type="text" data-path="S.legal.${i}.k" value="${esc(o.k)}"></td><td class="n">${inpN(`S.legal.${i}.vat`,o.vat,"1")}</td></tr>`).join("")}</tbody></table></div>`)}
+ ${card(c.fx,`<div class="tbl-wrap"><table><tbody>${S.fx.map((o,i)=>`<tr><td>${o.k}</td><td class="n">${inpN(`S.fx.${i}.r`,o.r,"0.01")}</td></tr>`).join("")}</tbody></table></div>`)}
+ <div class="row"><button class="btn ghost" id="btnReset">${c.reset}</button></div>
+ </div>`);
+}
+
+/* ===================== events ===================== */
+function setPath(path,val){const parts=path.split("."); let o=parts[0]==="S"?S:I; for(let i=1;i<parts.length-1;i++) o=o[parts[i]]; o[parts[parts.length-1]]=val;}
+function bind(root){
+ root.querySelectorAll("[data-i]").forEach(el=>el.addEventListener("change",e=>{const v=el.type==="number"?Number(el.value):el.value; I[el.dataset.i]=v; render();}));
+ root.querySelectorAll("[data-path]").forEach(el=>el.addEventListener("change",()=>{setPath(el.dataset.path,el.type==="number"?Number(el.value):el.value); render();}));
+ root.querySelectorAll("[data-pkg]").forEach(el=>el.addEventListener("click",()=>{I.pkg=el.dataset.pkg; render();}));
+ root.querySelectorAll("[data-addon]").forEach(el=>el.addEventListener("change",()=>{I.addons[el.dataset.addon]=el.checked; render();}));
+ root.querySelectorAll("[data-risk]").forEach(el=>el.addEventListener("change",()=>{I.risks[el.dataset.risk]=el.checked; render();}));
+ root.querySelectorAll("[data-inclprem]").forEach(el=>el.addEventListener("change",()=>{const a=S.addons[+el.dataset.inclprem]; a.incl=el.checked?["premium"]:[]; render();}));
+ root.querySelectorAll("[data-prj]").forEach(el=>el.addEventListener("change",()=>{const p=I.projects[+el.dataset.prj]; p[el.dataset.f]=el.type==="number"?Number(el.value):el.value; render();}));
+ root.querySelectorAll("[data-delprj]").forEach(el=>el.addEventListener("click",()=>{I.projects.splice(+el.dataset.delprj,1); render();}));
+ root.querySelectorAll("[data-pl]").forEach(el=>el.addEventListener("click",()=>{ui.proposalLang=el.dataset.pl; render();}));
+ const add=$("#btnAddPrj",root); if(add) add.onclick=()=>{I.projects.push({name:I.company||("Project "+(I.projects.length+1)),pkg:I.pkg,weeks:calcAll()[I.pkg].weeks[1],inp:{unit:I.unit,nDept:I.nDept,nWf:I.nWf,interviews:I.interviews,roadmap:I.roadmap,usecases:I.usecases,wdays:I.wdays,addons:Object.assign({},I.addons),country:I.country,vertical:I.vertical,size:I.size,urgency:I.urgency,maturity:I.maturity,partner:I.partner,legal:I.legal}}); render();};
+ const cp=$("#btnCopy",root); if(cp) cp.onclick=async()=>{const ta=$("#proposalText"); try{await navigator.clipboard.writeText(ta.value);}catch(e){ta.select();document.execCommand("copy");} $("#copyMsg").textContent=t().proposal.copied;};
+ const rs=$("#btnReset",root); if(rs) rs.onclick=()=>{if(confirm(t().settings.resetQ)){S=DEF_SETTINGS(); render();}};
+ const ex=$("#btnExport",root); if(ex) ex.onclick=exportCSV;
+ const tg=$("#inTarget",root); if(tg) tg.onchange=()=>{ui.target=Number(tg.value); render();};
+ const cn=$("#inCalibN",root); if(cn) cn.onchange=()=>{ui.calibN=Number(cn.value); render();};
+ const ap=$("#btnApplyNorm",root); if(ap) ap.onclick=()=>{const k=Number(ap.dataset.k); for(const key of ["session","analysis","ba","pm","tl","arch"]) S.norm[key]=Math.round(S.norm[key]*k*4)/4; if(I.unit==="dept") I.nDept=Math.max(1,Number(ui.calibN)||6); else I.nWf=Math.max(1,Number(ui.calibN)||6); render(); const m=$("#applyMsg"); if(m) m.textContent=t().result.applied;};
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-p]"); if(b){ui.page=b.dataset.p; render(); window.scrollTo(0,0);}});
+function csvOf(R){
+ const q=s=>'"'+String(s).replace(/"/g,'""')+'"';
+ const rows=[["Client",I.company],["Country",I.country],["Vertical",I.vertical],["Size",I.size],["Urgency",I.urgency],["Maturity",I.maturity],["Currency",I.cur],["Partner option",I.partner],["Payment terms",I.pay],[]];
+ rows.push(["Package","Hours","Days","Cost EUR","Client price EUR","Client price ("+I.cur+")","Partner fee EUR","Net EUR","Weeks"]);
+ for(const p of ["workshop","express","discovery","premium"]){const x=R[p]; const r=lk(S.fx,I.cur,"r")||1; rows.push([p,x.totalH.toFixed(1),x.days.toFixed(1),x.cost.toFixed(0),x.price.toFixed(0),(x.price*r).toFixed(0),x.pfee.toFixed(0),x.net.toFixed(0),x.weeks.join("-")]);}
+ rows.push([]); rows.push(["Selected: "+I.pkg]); rows.push(["Line","BA","PM","TL","Arch"]);
+ const x=R[I.pkg]; for(const l of x.lines) rows.push([t().result.linesL[l.id],...ROLES.map(k=>l.h[k])]);
+ for(const a of x.addons) rows.push([a.a.en,...(a.h?ROLES.map(k=>a.h[k]):["fixed",a.fixed])]);
+ if(ui.mode==="partner"){ // strip cost columns
+  return rows.map(r=>r.length===9&&r[0]!=="Package"&&["workshop","express","discovery","premium"].includes(r[0])?[r[0],r[1],r[2],"",r[4],r[5],"","",r[8]]:r.length===9?[r[0],r[1],r[2],"",r[4],r[5],"","",r[8]]:r).map(r=>r.map(q).join(",")).join("\n");
+ }
+ return rows.map(r=>r.map(q).join(",")).join("\n");
+}
+async function exportCSV(){
+ const msg=$("#exportMsg"); const R=calcAll(); const csv="\ufeff"+csvOf(R);
+ const name=`velway-discovery-${(I.company||"estimate").replace(/[^\w\-]+/g,"_")}.csv`;
+ try{
+  const dl = window.claude && window.claude.use ? await window.claude.use("downloads") : null;
+  if(dl){ await dl.save({filename:name,data:csv}); msg.textContent="✓"; return; }
+ }catch(e){ if(e&&e.code==="declined"){msg.textContent="";return;} }
+ try{ await navigator.clipboard.writeText(csv); msg.textContent=(ui.lang==="uk"?"Експорт недоступний тут — CSV скопійовано у буфер":"Export unavailable here — CSV copied to clipboard"); }
+ catch(e){ msg.textContent=t().result.exportNo; }
+}
+$("#modeSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{ui.mode=b.dataset.m; render();});
+$("#langSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{ui.lang=b.dataset.l; ui.proposalLang=b.dataset.l; render();});
+load(); render();
+</script>
+</body>
+</html>

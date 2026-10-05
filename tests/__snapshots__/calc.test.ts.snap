@@ -1,0 +1,58 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`control figures (default state, M = 1.0) > snapshot of the default calcAll() 1`] = `
+{
+  "discovery": {
+    "cost": 5962,
+    "days": 13.61,
+    "hours": 108.9,
+    "minApplied": false,
+    "net": 13905,
+    "pfee": 1000,
+    "price": 14905,
+    "weeks": [
+      3,
+      6,
+    ],
+  },
+  "express": {
+    "cost": 2035,
+    "days": 4.81,
+    "hours": 38.5,
+    "minApplied": false,
+    "net": 4088,
+    "pfee": 1000,
+    "price": 5088,
+    "weeks": [
+      2,
+      3,
+    ],
+  },
+  "premium": {
+    "cost": 11539,
+    "days": 24.34,
+    "hours": 194.7,
+    "minApplied": false,
+    "net": 27848,
+    "pfee": 1000,
+    "price": 28848,
+    "weeks": [
+      6,
+      10,
+    ],
+  },
+  "workshop": {
+    "cost": 1628,
+    "days": 3.99,
+    "hours": 31.9,
+    "minApplied": false,
+    "net": 3070,
+    "pfee": 1000,
+    "price": 4070,
+    "weeks": [
+      1,
+      2,
+    ],
+  },
+}
+`;
