@@ -86,7 +86,7 @@ export function normalize(raw: Partial<AppData> | null | undefined): AppData {
   const activeId = clients.some((c) => c.id === raw.activeId) ? (raw.activeId as string) : clients[0].id;
   const projects = Array.isArray(raw.projects) ? raw.projects.filter((p) => ProjectZ.safeParse(p).success) : [];
   const ui = { ...DEF_UI(), ...(raw.ui && typeof raw.ui === "object" ? raw.ui : {}) };
-  if (!ui.enDefault) Object.assign(ui, { lang: "en", proposalLang: "en", enDefault: true });
+  if (!(raw.ui as Partial<UiState> | undefined)?.enDefault) Object.assign(ui, { lang: "en", proposalLang: "en", enDefault: true });
   return { version: SCHEMA_VERSION, settings, clients, activeId, projects, ui };
 }
 
