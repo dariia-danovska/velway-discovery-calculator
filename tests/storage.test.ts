@@ -76,3 +76,15 @@ describe("CSV", () => {
     expect(partner).not.toContain("Cost EUR");
   });
 });
+
+describe("English default", () => {
+  it("switches a previously saved Ukrainian UI to English once", () => {
+    const d = loadData(localStorage);
+    saveData({ ...d, ui: { ...d.ui, lang: "uk", proposalLang: "uk", enDefault: undefined } }, localStorage);
+    const d2 = loadData(localStorage);
+    expect(d2.ui.lang).toBe("en");
+    // after that, an explicit choice of UA is kept
+    saveData({ ...d2, ui: { ...d2.ui, lang: "uk" } }, localStorage);
+    expect(loadData(localStorage).ui.lang).toBe("uk");
+  });
+});

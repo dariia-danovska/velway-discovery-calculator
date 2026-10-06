@@ -18,6 +18,8 @@ export interface UiState {
   proposalLang: "uk" | "en";
   target: number;
   calibN: number;
+  /** set once English became the default; older saved states are switched to English on load */
+  enDefault?: boolean;
 }
 export interface ClientRec { id: string; updatedAt: string; input: Input }
 export interface AppData {
@@ -29,7 +31,7 @@ export interface AppData {
   ui: UiState;
 }
 
-export const DEF_UI = (): UiState => ({ page: "client", mode: "internal", lang: "en", proposalLang: "en", target: 15000, calibN: 6 });
+export const DEF_UI = (): UiState => ({ page: "client", mode: "internal", lang: "en", proposalLang: "en", target: 15000, calibN: 6, enDefault: true });
 
 export const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 
@@ -84,6 +86,7 @@ export function normalize(raw: Partial<AppData> | null | undefined): AppData {
   const activeId = clients.some((c) => c.id === raw.activeId) ? (raw.activeId as string) : clients[0].id;
   const projects = Array.isArray(raw.projects) ? raw.projects.filter((p) => ProjectZ.safeParse(p).success) : [];
   const ui = { ...DEF_UI(), ...(raw.ui && typeof raw.ui === "object" ? raw.ui : {}) };
+  if (!ui.enDefault) Object.assign(ui, { lang: "en", proposalLang: "en", enDefault: true });
   return { version: SCHEMA_VERSION, settings, clients, activeId, projects, ui };
 }
 
