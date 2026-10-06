@@ -17,7 +17,7 @@ export function pResult(R: AllResults): string {
   const roles = ROLES.map((k) => `<tr><td>${sr[k]}</td><td class="n">${fmt(x.H[k] * x.buf, 1)}</td><td class="n internal-only">${st.rates[k]}</td><td class="n internal-only">${fmt(x.H[k] * x.buf * st.rates[k])}</td></tr>`).join("");
   const cmp = PKGS.map((p) => {
     const y = R[p];
-    return `<tr><td>${t().scope.pkgs[p]} ${y.minApplied ? `<span class="pill warn">${r.min_applied}</span>` : ""}</td><td class="n">${fmt(y.totalH, 1)}</td><td class="n">${fmt(y.days, 1)}</td><td class="n internal-only">${fmt(y.cost)}</td><td class="n">${money(y.price)}</td><td class="n internal-only">${fmt(y.pfee)}</td><td class="n internal-only">${fmt(y.net)}</td><td class="n">${y.weeks[0]}–${y.weeks[1]}</td></tr>`;
+    return `<tr><td>${t().scope.pkgs[p]} ${y.minApplied ? `<span class="pill warn">${r.min_applied}</span>` : ""}</td><td class="n">${fmt(y.totalH, 1)}</td><td class="n internal-only">${fmt(y.cost)}</td><td class="n">${money(y.price)}</td><td class="n internal-only">${fmt(y.pfee)}</td><td class="n internal-only">${fmt(y.net)}</td><td class="n">${y.weeks[0]}–${y.weeks[1]}</td></tr>`;
   }).join("");
   return `<div class="page on">${head(r.title, r.sub)}
  <div class="hero">
@@ -25,7 +25,7 @@ export function pResult(R: AllResults): string {
    <div class="sm">${r.client_price}</div><div class="bigprice">${money(x.price)}</div>
    ${i.cur !== "EUR" ? `<div class="sm">= ${fmt(x.price)} EUR</div>` : ""}
    ${x.vatRate > 0 ? `<div class="kv" style="margin-top:8px"><div>${r.vat} ${x.vatRate}%</div><div class="n">${money(vat)}</div><div>${r.gross}</div><div class="n">${money(x.price + vat)}</div></div>` : ""}
-   <div class="kv" style="margin-top:14px"><div>${r.timeline}</div><div class="n">${x.weeks[0]}–${x.weeks[1]} ${r.weeks}</div><div>${r.total} ${r.h.toLowerCase()} / ${r.d.toLowerCase()}</div><div class="n">${fmt(x.totalH, 1)} / ${fmt(x.days, 1)}</div></div>
+   <div class="kv" style="margin-top:14px"><div>${r.timeline}</div><div class="n">${x.weeks[0]}–${x.weeks[1]} ${r.weeks}</div><div>${r.total} ${r.h.toLowerCase()}</div><div class="n">${fmt(x.totalH, 1)}</div></div>
    <h2>${r.pay} (${esc(i.pay)})</h2><div class="kv">${pay}</div>
   </section>
   <section class="card internal-only"><h2>Cost → price → net</h2>
@@ -40,7 +40,7 @@ export function pResult(R: AllResults): string {
     <div>− ${r.partner_fee} (${i.partner === "none" ? "—" : i.partner})</div><div class="n">${fmt(x.pfee)} €</div>
     ${i.travel ? `<div>− ${r.ext}</div><div class="n">${fmt(i.travel)} €</div>` : ""}
     <div class="tot">${r.net}</div><div class="n tot">${fmt(x.net)} €</div>
-    <div>${r.eff_rate}</div><div class="n">${fmt(x.consult / x.totalH)} €/h · ${fmt(x.consult / x.days)} ${r.per_day}</div>
+    <div>${r.eff_rate}</div><div class="n">${fmt(x.consult / x.totalH)} €/h</div>
    </div>
    <div class="sm" style="margin-top:10px">${r.multiplierbreak}: ${Object.entries(x.mult).map(([k, v]) => k + " ×" + v).join(" · ")}</div>
    ${i.partner === "C" ? `<div class="note" style="margin-top:10px">${t().settings.pC}</div>` : ""}
@@ -49,7 +49,7 @@ export function pResult(R: AllResults): string {
  ${card(r.hours, `<div class="tbl-wrap"><table><thead><tr><th>${r.role}</th><th class="n">${r.h}</th><th class="n internal-only">${r.rate} €/h</th><th class="n internal-only">${r.costc}</th></tr></thead><tbody>${roles}</tbody></table></div>
   <div class="tbl-wrap" style="margin-top:16px"><table><thead><tr><th></th><th class="n">BA</th><th class="n">PM</th><th class="n">TL</th><th class="n">Arch</th><th class="n">Σ</th></tr></thead><tbody>${lines}</tbody></table></div>`)}
  ${card(r.scen, scenarioHTML(), r.scenSub)}
- ${card(r.compare, `<div class="tbl-wrap"><table><thead><tr><th></th><th class="n">${r.h}</th><th class="n">${r.d}</th><th class="n internal-only">Cost €</th><th class="n">${r.client_price}</th><th class="n internal-only">${r.partner_fee}</th><th class="n internal-only">${r.net}</th><th class="n">${r.weeks}</th></tr></thead><tbody>${cmp}</tbody></table></div>
+ ${card(r.compare, `<div class="tbl-wrap"><table><thead><tr><th></th><th class="n">${r.h}</th><th class="n internal-only">Cost €</th><th class="n">${r.client_price}</th><th class="n internal-only">${r.partner_fee}</th><th class="n internal-only">${r.net}</th><th class="n">${r.weeks}</th></tr></thead><tbody>${cmp}</tbody></table></div>
   <div class="row" style="margin-top:12px"><button class="btn" id="btnExport">${r.export}</button><span class="sm" id="exportMsg"></span></div>`)}
  </div>`;
 }

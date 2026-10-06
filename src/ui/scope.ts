@@ -11,7 +11,7 @@ export function pScope(R: AllResults): string {
     const x = R[p];
     return `<div class="pkg ${i.pkg === p ? "on" : ""}" data-pkg="${p}">
    <div class="name">${s.pkgs[p]}</div><div class="price">${ok ? money(x.price) : "—"}</div>
-   <div class="meta">${s.pkgd[p]}</div><div class="meta">${x.weeks[0]}–${x.weeks[1]} ${r.weeks} · ${fmt(x.days, 1)} ${r.d.toLowerCase()}</div>
+   <div class="meta">${s.pkgd[p]}</div><div class="meta">${x.weeks[0]}–${x.weeks[1]} ${r.weeks}</div>
    <div class="cost internal-only">cost ${fmt(x.cost)} € · net ${fmt(x.net)} €</div></div>`;
   }).join("");
   const isW = i.pkg === "workshop", isE = i.pkg === "express";

@@ -92,7 +92,7 @@ function renderSumbar(R: AllResults): void {
   $("#sumbar")!.innerHTML = langOK(i, S())
     ? `<span class="dim">${t().scope.pkgs[i.pkg]}</span><b>${money(r.price)}</b>
      <span class="internal-only dim">cost ${fmt(r.cost)} € · net ${fmt(r.net)} €</span>
-     <span class="dim">${fmt(r.days, 1)} ${tt.d.toLowerCase()} · ${r.weeks[0]}–${r.weeks[1]} ${tt.weeks}</span>`
+     <span class="dim">${r.weeks[0]}–${r.weeks[1]} ${tt.weeks}</span>`
     : `<span class="pill bad">${t().client.langWarn}</span>`;
 }
 
