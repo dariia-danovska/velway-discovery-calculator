@@ -34,6 +34,7 @@ export const DEF_SETTINGS = (): Settings => ({
     { id: "supervision", uk: "Супервізія пілота (3 міс, щомісячні check-ins)", en: "Pilot supervision (3 months, monthly check-ins)", h: { ba: 2, pm: 12, tl: 6, arch: 6 }, fixed: 0, incl: ["premium"] },
     { id: "vendor", uk: "Вибір вендора / інтегратора", en: "Vendor / integrator selection", h: { ba: 4, pm: 1, tl: 3, arch: 6 }, fixed: 0, incl: ["premium"] },
     { id: "training", uk: "AI-навчання команди (2 год + матеріали)", en: "AI training for team (2h + materials)", h: { ba: 5, pm: 0, tl: 1, arch: 0 }, fixed: 0, incl: ["premium"] },
+    { id: "prototype", uk: "Прототипування (клікабельний прототип / PoC топ use case'у)", en: "Prototyping (clickable prototype / PoC of the top use case)", h: { ba: 4, pm: 2, tl: 16, arch: 6 }, fixed: 0, incl: [] },
   ],
   country: [
     { k: "Ukraine", m: 0.7, c: "EUR" }, { k: "Poland", m: 1.0, c: "PLN" }, { k: "Portugal", m: 1.0, c: "EUR" }, { k: "Romania", m: 1.0, c: "EUR" }, { k: "Czechia / Slovakia", m: 1.0, c: "EUR" },

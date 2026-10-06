@@ -109,6 +109,14 @@ describe("model rules", () => {
   });
 });
 
+it("Prototyping add-on: off by default, adds its hours when chosen", () => {
+  const base = calcPkg("discovery", I0, S0);
+  const x = calcPkg("discovery", { ...I0, addons: { prototype: true } }, S0);
+  expect(base.addons.some((a) => a.a.id === "prototype")).toBe(false);
+  expect(x.totalH - base.totalH).toBeCloseTo(28 * 1.1, 6);
+  expect(Math.round(x.cost - base.cost)).toBe(Math.round((4 * 40 + 2 * 30 + 16 * 70 + 6 * 100) * 1.1));
+});
+
 describe("norm calibration", () => {
   it("k for 6 departments at 15 000 € reproduces the target exactly (before rounding)", () => {
     const { k } = calibrate(I0, S0, 15000, 6);
@@ -153,7 +161,8 @@ describe("equivalence with prototype/velway-discovery-calculator.html", () => {
     nDept: 1 + Math.floor(rnd() * 10), nWf: 1 + Math.floor(rnd() * 10), interviews: Math.floor(rnd() * 6),
     roadmap: pick(["6", "12", "18", "24"]), usecases: Math.floor(rnd() * 20), wdays: 1 + Math.floor(rnd() * 3),
     travel: pick([0, 0, 350, 1200]),
-    addons: Object.fromEntries(S0.addons.map((a) => [a.id, rnd() < 0.3])),
+    // only add-ons that exist in the prototype ("prototype" was added later)
+    addons: Object.fromEntries(S0.addons.filter((a) => a.id !== "prototype").map((a) => [a.id, rnd() < 0.3])),
   }));
 
   it.each(scenarios.map((s, i) => [i, s] as const))("scenario %i", (_i, s) => {

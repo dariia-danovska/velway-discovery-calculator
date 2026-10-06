@@ -106,3 +106,10 @@ it("quote currencies are EUR / USD / GBP / UAH; saved PLN / CHF are dropped", ()
   expect(d2.settings.fx.map((f) => f.k)).toEqual(["EUR", "USD", "GBP", "UAH"]);
   expect(d2.clients[0].input.cur).toBe("EUR");
 });
+
+it("settings saved before the Prototyping add-on existed get it appended", () => {
+  const d = loadData(localStorage);
+  d.settings.addons = d.settings.addons.filter((a) => a.id !== "prototype");
+  saveData(d, localStorage);
+  expect(loadData(localStorage).settings.addons.map((a) => a.id)).toContain("prototype");
+});

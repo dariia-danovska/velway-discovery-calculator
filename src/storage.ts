@@ -79,6 +79,8 @@ export function normalize(raw: Partial<AppData> | null | undefined): AppData {
   const curs = DEF_SETTINGS().fx.map((f) => f.k);
   settings.fx = settings.fx.filter((f) => curs.includes(f.k));
   if (!settings.fx.length) settings.fx = DEF_SETTINGS().fx;
+  // add-ons introduced after the settings were saved (e.g. "prototype") are appended
+  for (const a of DEF_SETTINGS().addons) if (!settings.addons.some((x) => x.id === a.id)) settings.addons.push(a);
   const clients: ClientRec[] = Array.isArray(raw.clients)
     ? raw.clients.flatMap((c) => {
         if (!c || typeof c !== "object" || typeof c.id !== "string") return [];
