@@ -141,3 +141,4 @@ label.btn{display:inline-block}
   #printArea .pbrand{font-weight:600;color:#0F4C4C;border-bottom:1px solid #0F4C4C;padding-bottom:6px;margin-bottom:14px}
   #printArea pre{white-space:pre-wrap;word-wrap:break-word;font-family:var(--sans);font-size:11pt;margin:0}
 }
+.grid.g5{grid-template-columns:repeat(auto-fit,minmax(130px,1fr));column-gap:16px}

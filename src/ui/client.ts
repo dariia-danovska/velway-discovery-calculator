@@ -34,7 +34,7 @@ export function pClient(): string {
   const m = (o: { k: string; m: number }) => o.k + " · ×" + o.m;
   return `<div class="page on">${head(c.title, c.sub)}
  ${clientsCard()}
- ${card(c.basic, `<div class="grid">
+ ${card(c.basic, `<div class="grid g5">
   ${field(c.company, `<input type="text" data-i="company" value="${esc(i.company)}">`)}
   ${field(c.contact, `<input type="text" data-i="contact" value="${esc(i.contact)}">`)}
   ${field(c.email, `<input type="text" data-i="email" value="${esc(i.email)}">`)}
