@@ -75,6 +75,10 @@ export function normalize(raw: Partial<AppData> | null | undefined): AppData {
   if (!raw || typeof raw !== "object") return d;
   const s = SettingsZ.safeParse(raw.settings ?? {});
   const settings = mergeSettings(s.success ? s.data : {});
+  // quote currencies are limited to the default list (EUR / USD / GBP / UAH); drop ones removed from it (PLN, CHF)
+  const curs = DEF_SETTINGS().fx.map((f) => f.k);
+  settings.fx = settings.fx.filter((f) => curs.includes(f.k));
+  if (!settings.fx.length) settings.fx = DEF_SETTINGS().fx;
   const clients: ClientRec[] = Array.isArray(raw.clients)
     ? raw.clients.flatMap((c) => {
         if (!c || typeof c !== "object" || typeof c.id !== "string") return [];
@@ -82,6 +86,7 @@ export function normalize(raw: Partial<AppData> | null | undefined): AppData {
         const input = mergeInput(inp.success ? inp.data : {});
         // the delivery-language field was removed from the UI: never leave a client stuck on an unsupported language
         if (!settings.langs.some((l) => l.ok && l.k === input.lang)) input.lang = "EN";
+        if (!settings.fx.some((f) => f.k === input.cur)) input.cur = "EUR";
         return [{ id: c.id, updatedAt: typeof c.updatedAt === "string" ? c.updatedAt : new Date().toISOString(), input }];
       })
     : [];

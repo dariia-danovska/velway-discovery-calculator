@@ -56,7 +56,7 @@ export const DEF_SETTINGS = (): Settings => ({
   ],
   langs: [{ k: "EN", ok: true }, { k: "UA", ok: true }, { k: "PL", ok: false }, { k: "DE", ok: false }, { k: "ES", ok: false }, { k: "EL", ok: false }, { k: "Other", ok: false }],
   partner: { aPct: 10, bFixed: 1000, bPct: 2 },
-  fx: [{ k: "EUR", r: 1 }, { k: "USD", r: 1.08 }, { k: "GBP", r: 0.85 }, { k: "PLN", r: 4.3 }, { k: "UAH", r: 45.5 }, { k: "CHF", r: 0.95 }],
+  fx: [{ k: "EUR", r: 1 }, { k: "USD", r: 1.08 }, { k: "GBP", r: 0.85 }, { k: "UAH", r: 45.5 }],
   legal: [
     { k: "Velway (LT, VAT payer)", vat: 21, uk: "Velway AI Solutions, Литва. Ціни без ПДВ; ПДВ застосовується згідно з правилами ЄС (reverse charge для B2B в ЄС).", en: "Velway AI Solutions, Lithuania. Prices exclude VAT; VAT applied per EU rules (reverse charge for EU B2B)." },
     { k: "IT Dev Solutions (UA sole proprietor)", vat: 0, uk: "ФОП, спрощена система. Ціни без податків.", en: "Ukrainian sole proprietor, simplified tax regime. Prices are net of taxes." },

@@ -95,3 +95,14 @@ it("clients saved with an unsupported delivery language are reset to EN on load"
   saveData(d, localStorage);
   expect(loadData(localStorage).clients[0].input.lang).toBe("EN");
 });
+
+it("quote currencies are EUR / USD / GBP / UAH; saved PLN / CHF are dropped", () => {
+  expect(DEF_SETTINGS().fx.map((f) => f.k)).toEqual(["EUR", "USD", "GBP", "UAH"]);
+  const d = loadData(localStorage);
+  d.settings.fx = [...d.settings.fx, { k: "PLN", r: 4.3 }, { k: "CHF", r: 0.95 }];
+  d.clients[0].input.cur = "PLN";
+  saveData(d, localStorage);
+  const d2 = loadData(localStorage);
+  expect(d2.settings.fx.map((f) => f.k)).toEqual(["EUR", "USD", "GBP", "UAH"]);
+  expect(d2.clients[0].input.cur).toBe("EUR");
+});
