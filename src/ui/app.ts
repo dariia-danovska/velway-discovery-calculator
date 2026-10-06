@@ -29,7 +29,7 @@ const SHELL = `
     <div class="brand">Velway<small>AI Discovery · pricing calculator</small></div>
     <nav class="nav" id="nav"></nav>
     <div class="modebox" id="modeBox">
-      <label id="lblMode">Режим</label>
+      <label id="lblMode">Mode</label>
       <div class="seg" id="modeSeg">
         <button data-m="internal">Internal</button>
         <button data-m="partner">Partner</button>
@@ -37,7 +37,7 @@ const SHELL = `
       <div class="lockhint" id="lockHint"></div>
     </div>
     <div class="modebox">
-      <label id="lblLang">Мова інтерфейсу</label>
+      <label id="lblLang">Interface language</label>
       <div class="seg" id="langSeg">
         <button data-l="uk">UA</button>
         <button data-l="en">EN</button>

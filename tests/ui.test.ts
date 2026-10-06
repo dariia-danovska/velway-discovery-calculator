@@ -80,13 +80,13 @@ describe("UI smoke", () => {
     change(root.querySelector('[data-i="company"]') as HTMLInputElement, "ACME GmbH");
     click(root.querySelector(`[data-cdup="${app.d.activeId}"]`));
     expect(app.d.clients.length).toBe(3);
-    expect(app.d.clients[2].input.company).toBe("ACME GmbH (копія)");
+    expect(app.d.clients[2].input.company).toBe("ACME GmbH (copy)");
     const first = app.d.clients[0].id;
     click(root.querySelector(`[data-copen="${first}"]`));
     expect(app.d.activeId).toBe(first);
     window.confirm = () => true;
     click(root.querySelector(`[data-cdel="${app.d.clients[1].id}"]`));
-    expect(app.d.clients.map((c) => c.input.company)).toEqual(["Przykład Sp. z o.o. (example)", "ACME GmbH (копія)"]);
+    expect(app.d.clients.map((c) => c.input.company)).toEqual(["Przykład Sp. z o.o. (example)", "ACME GmbH (copy)"]);
     // persisted
     const saved = JSON.parse(localStorage.getItem("velway.calc.v3")!);
     expect(saved.clients.length).toBe(2);

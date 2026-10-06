@@ -1,103 +1,103 @@
 # Velway · AI Discovery Pricing Calculator
 
-Калькулятор вартості AI Discovery для Velway AI Solutions: клієнт → скоуп → собівартість → ціна → партнерська комісія → net, capacity-планувальник, ризик-чекліст і генерація КП (UA/EN).
-Статичний сайт (Vite + TypeScript, без фреймворку і без бекенду). Дані зберігаються в `localStorage` браузера.
+Pricing calculator for Velway AI Solutions' AI Discovery engagements: client → scope → cost → price → partner fee → net, plus a capacity planner, a risk checklist and proposal generation (EN/UA).
+Static site (Vite + TypeScript, no framework, no backend). Data is stored in the browser's `localStorage`.
 
-Бізнес-контекст, формули та нормативи — у внутрішньому документі `AI_Discovery_Calculator_HANDOFF.md` (не публікується; локально — `docs/`, у .gitignore).
-Оригінальний прототип (еталон поведінки і цифр) — [`prototype/velway-discovery-calculator.html`](prototype/velway-discovery-calculator.html).
+Business context, formulas and norms are in the internal document `AI_Discovery_Calculator_HANDOFF.md` (not published; kept locally in `docs/`, which is git-ignored).
+The original prototype (the reference for behaviour and figures) is [`prototype/velway-discovery-calculator.html`](prototype/velway-discovery-calculator.html).
 
-## Запуск локально
+## Run locally
 
 ```bash
 npm install
 npm run dev        # http://localhost:5173
-npm test           # vitest: модель, еквівалентність із прототипом, storage/імпорт, UI smoke (jsdom)
+npm test           # vitest: model, equivalence with the prototype, storage/import, UI smoke (jsdom)
 npm run build      # → dist/
-npm run preview    # перегляд зібраного dist/
+npm run preview    # serve the built dist/
 ```
 
-## Структура
+## Structure
 
 ```
 src/
   model/
-    defaults.ts   — УСІ default-цифри: ставки, маржі, нормативи, множники, add-ons, ризики
-    calc.ts       — calcPkg / calcAll / priceFor / calibrate — чисті функції
-    schema.ts     — zod-валідація імпорту JSON
+    defaults.ts   — ALL default figures: rates, margins, norms, multipliers, add-ons, risks
+    calc.ts       — calcPkg / calcAll / priceFor / calibrate — pure functions
+    schema.ts     — zod validation for JSON import
     types.ts
-  i18n/{uk,en}.ts — тексти інтерфейсу
-  ui/             — вкладки: client, scope, result, capacity, risks, proposal, settings; app.ts — оболонка й події
-  storage.ts      — localStorage (схема v3) + міграція з ключів прототипу velway.calc.v2.*
-  export.ts       — CSV і JSON (Blob-завантаження)
-  access.ts       — passphrase для Internal-режиму, ?mode=partner
+  i18n/{en,uk}.ts — UI strings
+  ui/             — tabs: client, scope, result, capacity, risks, proposal, settings; app.ts — shell and events
+  storage.ts      — localStorage (schema v3) + migration from the prototype keys velway.calc.v2.*
+  export.ts       — CSV and JSON (Blob download)
+  access.ts       — Internal-mode passphrase, ?mode=partner
 tests/            — vitest
 ```
 
-## Як змінити default-цифри
+## Changing the default figures
 
-Усі значення за замовчуванням — в одному файлі **`src/model/defaults.ts`** (`DEF_SETTINGS`, `DEF_INPUT`, `RISKS`).
-Після зміни запустіть `npm test`: тести `tests/calc.test.ts` фіксують контрольні цифри (Discovery 3 відділи = 14 905 € тощо) і впадуть — це навмисно. Оновіть очікувані значення в тесті та снепшот (`npx vitest run -u`), якщо зміна свідома.
+All defaults live in one file: **`src/model/defaults.ts`** (`DEF_SETTINGS`, `DEF_INPUT`, `RISKS`).
+After a change, run `npm test`: `tests/calc.test.ts` pins the control figures (Discovery with 3 departments = €14,905 etc.) and will fail — on purpose. If the change is intended, update the expected values in the test and the snapshot (`npx vitest run -u`).
 
-Зміни, зроблені користувачем у вкладці «Налаштування», зберігаються в його браузері й перекривають default; кнопка «Скинути до значень за замовчуванням» повертає `defaults.ts`.
+Changes a user makes on the Settings tab are stored in their browser and override the defaults; "Reset to defaults" restores `defaults.ts`.
 
-## Режими та доступ
+## Modes and access
 
-| Режим | Що видно |
+| Mode | What is visible |
 |---|---|
-| **Internal** | собівартість, маржа, net, вкладки Capacity і Налаштування, калібрування нормативу, експорт JSON |
-| **Partner** | лише ціна для клієнта; CSV без cost-колонок |
+| **Internal** | cost, margin, net, Capacity and Settings tabs, norm calibration, JSON export |
+| **Partner** | client price only; CSV without cost columns |
 
-- **Partner-посилання:** `https://<сайт>/?mode=partner` — режим зафіксовано, перемикача немає. Кнопка «Скопіювати Partner-посилання» — внизу бокової панелі в Internal.
-- **Passphrase для Internal** задається на етапі збірки змінною `VITE_INTERNAL_PASSPHRASE` (локально — у `.env`, див. `.env.example`; на GitHub — секрет репозиторію з такою самою назвою). Розблокування зберігається в `sessionStorage` до закриття вкладки; кнопка «Заблокувати» — під перемикачем режиму. Якщо змінна порожня — захисту немає.
+- **Partner link:** `https://<site>/?mode=partner` — the mode is pinned and the switch is hidden. A "Copy Partner link" button is at the bottom of the sidebar in Internal mode.
+- **Internal passphrase** is set at build time via `VITE_INTERNAL_PASSPHRASE` (locally in `.env`, see `.env.example`; on GitHub as a repository secret with the same name). Unlocking lasts for the browser-tab session (`sessionStorage`); a "Lock" button sits under the mode switch. If the variable is empty, there is no gate.
 
-> ⚠️ **Це не security.** Перевірка відбувається в браузері, а весь код і всі цифри (ставки, маржі) є в публічному JS-бандлі та в публічному репозиторії. У бандл потрапляє лише SHA-256-хеш фрази, а не сама фраза, але будь-хто з DevTools може ввімкнути Internal-режим. Мета — щоб sales-люди й партнери **випадково** не бачили маржу.
+> ⚠️ **This is not security.** The check runs in the browser, and all code and figures (rates, margins) are in the public JS bundle and the public repository. Only a SHA-256 hash of the passphrase is bundled, not the phrase itself, but anyone with DevTools can switch to Internal. The goal is just to keep sales people and partners from seeing margins **by accident**.
 
-### Справжній захист доступу
+### Real access protection
 
-GitHub Pages не вміє закривати сайт паролем. Варіанти:
+GitHub Pages cannot password-protect a site. Options:
 
-1. **Cloudflare Pages + Cloudflare Access (Zero Trust, безкоштовно до 50 користувачів).** Підключіть репозиторій у Cloudflare Pages (build `npm run build`, output `dist`, env `VITE_INTERNAL_PASSPHRASE`), далі Zero Trust → Access → Applications → *Self-hosted* → домен сайту → політика *Allow* для e-mail-адрес команди (one-time PIN на пошту). Для партнерів — окремий Access-application на той самий домен з іншою політикою або окремий деплой.
-2. **Netlify:** Site settings → Access & security → *Password protection* (платні плани) — один пароль на весь сайт. Деплой: `npx netlify deploy --prod --dir dist`.
-3. **Vercel:** Deployment Protection → Password Protection (платний план). Деплой: `npx vercel --prod`.
-4. **Домашній сервер (Docker + nginx):** додати `auth_basic` у nginx або поставити перед контейнером Cloudflare Tunnel + Access.
+1. **Cloudflare Pages + Cloudflare Access (Zero Trust, free up to 50 users).** Connect the repo in Cloudflare Pages (build `npm run build`, output `dist`, env `VITE_INTERNAL_PASSPHRASE`), then Zero Trust → Access → Applications → *Self-hosted* → the site domain → an *Allow* policy for the team's e-mail addresses (one-time PIN by e-mail). For partners, use a separate Access application/policy or a separate deployment.
+2. **Netlify:** Site settings → Access & security → *Password protection* (paid plans) — one password for the whole site. Deploy: `npx netlify deploy --prod --dir dist`.
+3. **Vercel:** Deployment Protection → Password Protection (paid plan). Deploy: `npx vercel --prod`.
+4. **Home server (Docker + nginx):** add `auth_basic` to nginx, or put Cloudflare Tunnel + Access in front of the container.
 
-## Деплой
+## Deployment
 
-### GitHub Pages (основний)
+### GitHub Pages (primary)
 
-Workflow `.github/workflows/deploy.yml`: push у `main` → `npm ci` → `npm test` → `npm run build` → `actions/deploy-pages`.
+Workflow `.github/workflows/deploy.yml`: push to `main` → `npm ci` → `npm test` → `npm run build` → `actions/deploy-pages`.
 
-Одноразове налаштування (вже зроблено для `dariia-danovska/velway-discovery-calculator`):
+One-time setup (already done for `dariia-danovska/velway-discovery-calculator`):
 
 ```bash
 gh repo create velway-discovery-calculator --public --source . --push
-gh secret set VITE_INTERNAL_PASSPHRASE          # ввести фразу
+gh secret set VITE_INTERNAL_PASSPHRASE          # enter the phrase
 gh api -X POST repos/{owner}/velway-discovery-calculator/pages -f build_type=workflow
 ```
 
-Після цього кожен `git push` у `main` автоматично деплоїть сайт. Щоб змінити passphrase: `gh secret set VITE_INTERNAL_PASSPHRASE` і перезапустити workflow (`gh workflow run deploy.yml`).
+After that, every `git push` to `main` deploys automatically. To change the passphrase: `gh secret set VITE_INTERNAL_PASSPHRASE`, then re-run the workflow (`gh workflow run deploy.yml`).
 
-`vite.config.ts` використовує відносний `base: "./"`, тож той самий білд працює і на `https://<user>.github.io/velway-discovery-calculator/`, і в корені домену. Перевизначити: `VITE_BASE=/foo/ npm run build`.
+`vite.config.ts` uses a relative `base: "./"`, so the same build works at `https://<user>.github.io/velway-discovery-calculator/` and at a domain root. Override with `VITE_BASE=/foo/ npm run build`.
 
-> GitHub Pages на безкоштовному плані потребує **публічного** репозиторію.
+> GitHub Pages on the free plan requires a **public** repository.
 
-### Docker (домашній сервер)
+### Docker (home server)
 
 ```bash
 docker build --build-arg VITE_INTERNAL_PASSPHRASE='…' -t velway-calc .
 docker run -d --restart unless-stopped -p 8080:80 --name velway-calc velway-calc
 ```
 
-## Дані: клієнти, експорт / імпорт
+## Data: clients, export / import
 
-- **Клієнт → «Збережені розрахунки»:** створити / відкрити / дублювати / видалити. Активний клієнт редагується на всіх вкладках.
-- **Capacity → «Додати із збережених клієнтів»:** проєкт прив'язується до клієнта і рахується з його актуальних даних (при видаленні клієнта лишається знімок).
-- **Експорт усього (JSON)** — налаштування + клієнти + проєкти Capacity; **Імпорт з JSON** замінює поточний стан (файл валідується, при помилці показується, яке поле невалідне).
-- **Налаштування → Експорт / Імпорт налаштувань** — лише settings, клієнти не змінюються.
-- **КП → «Зберегти PDF / друк»** — `window.print()` з print-стилями: лише текст КП, A4. У діалозі друку оберіть «Зберегти як PDF».
-- При першому запуску дані прототипу (`velway.calc.v2.*` у тому самому браузері/домені) автоматично мігруються в першого клієнта.
+- **Client → "Saved estimates":** create / open / duplicate / delete. The active client is edited on all tabs.
+- **Capacity → "Add from saved clients":** the project is linked to the client and computed from its current data (if the client is deleted, a snapshot is kept).
+- **Export everything (JSON)** — settings + clients + Capacity projects; **Import from JSON** replaces the current state (the file is validated; on error you see which field is invalid).
+- **Settings → Export / Import settings** — settings only, clients are not touched.
+- **Proposal → "Save PDF / print"** — `window.print()` with print styles: proposal text only, A4. Choose "Save as PDF" in the print dialog.
+- On first run, prototype data (`velway.calc.v2.*` in the same browser/domain) is migrated into the first client automatically.
 
-## Відомі нюанси
+## Known nuances
 
-- **Калібрування нормативу** («Застосувати цей норматив») округлює кожен компонент нормативу до 0,25 год, як у прототипі. Для дефолтного прикладу (6 відділів, ціль 15 000 €) після округлення ціна = 14 905 € (−95 €). Точний коефіцієнт (×0,504) дає 15 000 € ± 1 €.
-- Відкриті бізнес-питання (не вирішені, default як у прототипі): як тримати €4–8K для реферального каналу; фікс-ціна для add-on Technical Scope; окремий пакет для безкоштовної ініціативи AI Discovery.
+- **Norm calibration** ("Apply this norm") rounds each norm component to 0.25 h, as in the prototype. For the default example (6 departments, target €15,000) the price after rounding is €14,905 (−€95). The exact factor (×0.504) gives €15,000 ± €1.
+- Open business questions (not decided; defaults as in the prototype): how to hold €4–8K for the referral channel; a fixed price for the Technical Scope add-on; a separate package for the free AI Discovery initiative.

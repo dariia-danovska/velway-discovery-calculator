@@ -29,7 +29,7 @@ export interface AppData {
   ui: UiState;
 }
 
-export const DEF_UI = (): UiState => ({ page: "client", mode: "internal", lang: "uk", proposalLang: "uk", target: 15000, calibN: 6 });
+export const DEF_UI = (): UiState => ({ page: "client", mode: "internal", lang: "en", proposalLang: "en", target: 15000, calibN: 6 });
 
 export const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 

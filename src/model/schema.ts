@@ -69,7 +69,7 @@ export function parseExportFile(text: string): ExportFile {
   try {
     raw = JSON.parse(text);
   } catch {
-    throw new Error("not a JSON file / це не JSON-файл");
+    throw new Error("not a JSON file");
   }
   const r = ExportFileZ.safeParse(raw);
   if (!r.success) {
