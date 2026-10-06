@@ -79,7 +79,10 @@ export function normalize(raw: Partial<AppData> | null | undefined): AppData {
     ? raw.clients.flatMap((c) => {
         if (!c || typeof c !== "object" || typeof c.id !== "string") return [];
         const inp = InputZ.safeParse(c.input ?? {});
-        return [{ id: c.id, updatedAt: typeof c.updatedAt === "string" ? c.updatedAt : new Date().toISOString(), input: mergeInput(inp.success ? inp.data : {}) }];
+        const input = mergeInput(inp.success ? inp.data : {});
+        // the delivery-language field was removed from the UI: never leave a client stuck on an unsupported language
+        if (!settings.langs.some((l) => l.ok && l.k === input.lang)) input.lang = "EN";
+        return [{ id: c.id, updatedAt: typeof c.updatedAt === "string" ? c.updatedAt : new Date().toISOString(), input }];
       })
     : [];
   if (!clients.length) clients.push(d.clients[0]);

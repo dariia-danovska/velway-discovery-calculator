@@ -88,3 +88,10 @@ describe("English default", () => {
     expect(loadData(localStorage).ui.lang).toBe("uk");
   });
 });
+
+it("clients saved with an unsupported delivery language are reset to EN on load", () => {
+  const d = loadData(localStorage);
+  d.clients[0].input.lang = "DE";
+  saveData(d, localStorage);
+  expect(loadData(localStorage).clients[0].input.lang).toBe("EN");
+});

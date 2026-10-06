@@ -47,10 +47,9 @@ export function pClient(): string {
   ${field(c.size, `<select data-i="size">${opts(s.size, i.size, "k", m)}</select>`)}
   ${field(c.urgency, `<select data-i="urgency">${opts(s.urgency, i.urgency, "k", m)}</select>`)}
   ${field(c.maturity, `<select data-i="maturity">${opts(s.maturity, i.maturity, "k", m)}</select>`)}
-  ${field(c.lang, `<select data-i="lang">${opts(s.langs, i.lang, "k", (o) => o.k + (o.ok ? "" : " — n/a"))}</select>`)}
   ${field(c.channel, `<select data-i="channel">${opts([{ k: "referral" }, { k: "direct" }], i.channel, "k", (o) => c.channels[o.k as "referral" | "direct"])}</select>`)}
   ${field(c.cur, `<select data-i="cur">${opts(s.fx, i.cur)}</select>`)}
- </div>${langOK(i, s) ? "" : `<div class="note bad">${c.langWarn}</div>`}`)}
+ </div>`)}
  ${card(c.ctx, `<div class="grid">
   ${field(c.legal, `<select data-i="legal">${opts(s.legal, i.legal)}</select>`)}
   ${field(c.pay, `<select data-i="pay">${opts(s.payterms, i.pay)}</select>`)}

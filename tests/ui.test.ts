@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest";
-import { mount, render } from "../src/ui/app";
+import { _setInput, mount, render } from "../src/ui/app";
 import { app } from "../src/ui/state";
 
 const PAGES = ["client", "scope", "result", "capacity", "risks", "proposal", "settings"];
@@ -63,9 +63,15 @@ describe("UI smoke", () => {
     expect(root.querySelectorAll("#nav button").length).toBe(5);
   });
 
-  it("unsupported delivery language → warning, no price", () => {
+  it("no delivery-language field on the Client tab", () => {
     const root = setup();
-    change(root.querySelector('[data-i="lang"]') as HTMLSelectElement, "DE");
+    expect(root.querySelector('[data-i="lang"]')).toBeNull();
+  });
+
+  it("unsupported delivery language (model) → warning, no price", () => {
+    const root = setup();
+    _setInput({ lang: "DE" });
+    render();
     expect(root.querySelector("#sumbar .pill.bad")).not.toBeNull();
     click(root.querySelector('#nav [data-p="result"]'));
     expect(root.querySelector("#main .note.bad")).not.toBeNull();
