@@ -14,7 +14,7 @@ export function pResult(R: AllResults): string {
   const pay = (lk(st.payterms, i.pay, "s") || [100]).map((p, n) => `<div>${n + 1} · ${p}%</div><div class="n">${money((x.price * p) / 100)}</div>`).join("");
   const lines = x.lines.map((l) => `<tr><td>${r.linesL[l.id]}</td>${ROLES.map((k) => `<td class="n">${fmt(l.h[k], 1)}</td>`).join("")}<td class="n">${fmt(sumH(l.h), 1)}</td></tr>`).join("")
     + x.addons.map((a) => `<tr><td>+ ${esc(a.a[L])}${a.included ? ` <span class="pill">${t().scope.incl}</span>` : ""}</td>${a.h ? ROLES.map((k) => `<td class="n">${fmt(a.h![k], 1)}</td>`).join("") + `<td class="n">${fmt(sumH(a.h), 1)}</td>` : `<td colspan="5" class="n">${fmt(a.fixed!)} € ${t().scope.fixed}</td>`}</tr>`).join("");
-  const roles = ROLES.map((k) => `<tr><td>${sr[k]}</td><td class="n">${fmt(x.H[k] * x.buf, 1)}</td><td class="n">${fmt((x.H[k] * x.buf) / st.hpd, 1)}</td><td class="n internal-only">${st.rates[k]}</td><td class="n internal-only">${fmt(x.H[k] * x.buf * st.rates[k])}</td></tr>`).join("");
+  const roles = ROLES.map((k) => `<tr><td>${sr[k]}</td><td class="n">${fmt(x.H[k] * x.buf, 1)}</td><td class="n internal-only">${st.rates[k]}</td><td class="n internal-only">${fmt(x.H[k] * x.buf * st.rates[k])}</td></tr>`).join("");
   const cmp = PKGS.map((p) => {
     const y = R[p];
     return `<tr><td>${t().scope.pkgs[p]} ${y.minApplied ? `<span class="pill warn">${r.min_applied}</span>` : ""}</td><td class="n">${fmt(y.totalH, 1)}</td><td class="n">${fmt(y.days, 1)}</td><td class="n internal-only">${fmt(y.cost)}</td><td class="n">${money(y.price)}</td><td class="n internal-only">${fmt(y.pfee)}</td><td class="n internal-only">${fmt(y.net)}</td><td class="n">${y.weeks[0]}–${y.weeks[1]}</td></tr>`;
@@ -46,7 +46,7 @@ export function pResult(R: AllResults): string {
    ${i.partner === "C" ? `<div class="note" style="margin-top:10px">${t().settings.pC}</div>` : ""}
   </section>
  </div>
- ${card(r.hours, `<div class="tbl-wrap"><table><thead><tr><th>${r.role}</th><th class="n">${r.h}</th><th class="n">${r.d}</th><th class="n internal-only">${r.rate} €/h</th><th class="n internal-only">${r.costc}</th></tr></thead><tbody>${roles}</tbody></table></div>
+ ${card(r.hours, `<div class="tbl-wrap"><table><thead><tr><th>${r.role}</th><th class="n">${r.h}</th><th class="n internal-only">${r.rate} €/h</th><th class="n internal-only">${r.costc}</th></tr></thead><tbody>${roles}</tbody></table></div>
   <div class="tbl-wrap" style="margin-top:16px"><table><thead><tr><th></th><th class="n">BA</th><th class="n">PM</th><th class="n">TL</th><th class="n">Arch</th><th class="n">Σ</th></tr></thead><tbody>${lines}</tbody></table></div>`)}
  ${card(r.scen, scenarioHTML(), r.scenSub)}
  ${card(r.compare, `<div class="tbl-wrap"><table><thead><tr><th></th><th class="n">${r.h}</th><th class="n">${r.d}</th><th class="n internal-only">Cost €</th><th class="n">${r.client_price}</th><th class="n internal-only">${r.partner_fee}</th><th class="n internal-only">${r.net}</th><th class="n">${r.weeks}</th></tr></thead><tbody>${cmp}</tbody></table></div>
